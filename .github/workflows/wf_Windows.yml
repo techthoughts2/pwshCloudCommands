@@ -6,7 +6,7 @@
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-powershell
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-including-branches
-name: ActionsTest-Windows-Build
+name: pwshCloudCommands-Windows
 on:
   pull_request:
     branches-ignore:
