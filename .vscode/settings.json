@@ -1,0 +1,42 @@
+{
+    // When enabled, will trim trailing whitespace when you save a file.
+    "files.trimTrailingWhitespace": true,
+    // specifies the PowerShell coding style used in this project (https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81)
+    "powershell.codeFormatting.preset": "Stroustrup",
+    "cSpell.words": [
+        "ACCOUNTID",
+        "Backoff",
+        "bucketname",
+        "buildspec",
+        "childtemplates",
+        "Clixml",
+        "controlplane",
+        "Datapoints",
+        "datapull",
+        "Deduplication",
+        "discoverability",
+        "dotnetcore",
+        "Fargate",
+        "hashtable",
+        "hybridworker",
+        "jakemorrison",
+        "Maint",
+        "nextstep",
+        "notcontains",
+        "notlike",
+        "pscc",
+        "PSCCFBN",
+        "psccfunctions",
+        "PSCCPSCCSSM",
+        "PSCCSSM",
+        "psobject",
+        "pwsh",
+        "pwshcloudcommands",
+        "Redrive",
+        "sqseval",
+        "xmldatafiles"
+    ],
+    "cSpell.enableFiletypes": [
+        "powershell"
+    ]
+}

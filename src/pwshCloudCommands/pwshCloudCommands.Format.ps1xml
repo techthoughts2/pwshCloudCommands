@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>pFindCCTable</Name>
+            <ViewSelectedBy>
+                <TypeName>pFindCCFormat</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                        <TableColumnItem>
+                            <PropertyName>ModuleName</PropertyName>
+                        </TableColumnItem>
+                        <TableColumnItem>
+                            <PropertyName>Name</PropertyName>
+                        </TableColumnItem>
+                        <TableColumnItem>
+                            <PropertyName>Synopsis</PropertyName>
+                        </TableColumnItem>
+                    </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

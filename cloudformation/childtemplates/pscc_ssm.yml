@@ -1,0 +1,239 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: 'AUTOMATED: pwshCloudCommands - SSM deployment'
+
+Parameters:
+  ServiceName:
+    Type: String
+    Description: The name of the service being deployed. Used for Developer AWS Account Resource Names.
+
+  StackTag:
+    Type: String
+    Description: An environment tag for this stack. Used to differentiate what resource need or should be created.
+
+Resources:
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  SSMHybridWorkerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+      Policies:
+        - PolicyName: PSCCFinalXMLAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:ListBucketMultipartUploads
+                  - s3:DeleteObjectVersion
+                  - s3:ListBucketVersions
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                  - s3:ListMultipartUploadParts
+                Resource:
+                  - !Sub
+                    - 'arn:aws:s3:::${FinalXMLBucket}'
+                    - FinalXMLBucket:
+                        'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
+                  - !Sub
+                    - 'arn:aws:s3:::${FinalXMLBucket}/*'
+                    - FinalXMLBucket:
+                        'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
+
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  PSCCMaintenanceWindowTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonSSMMaintenanceWindowRole
+      Policies:
+        - PolicyName: pass-role
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - !GetAtt PSCCSSMMaintenanceWindowTaskCommandRole.Arn
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  PSCCSSMMaintenanceWindowTaskCommandRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      # ManagedPolicyArns:
+      #   - arn:aws:iam::aws:policy/service-role/AmazonSSMMaintenanceWindowRole
+      #   # - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+      #   - arn:aws:iam::aws:policy/CloudWatchFullAccess
+      Policies:
+        - PolicyName: SSMPublishAlertTopic
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:alertTopic
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-maintenancewindow.html
+  PSCCMaintWindow:
+    Type: AWS::SSM::MaintenanceWindow
+    Properties:
+      AllowUnassociatedTargets: false
+      Cutoff: 0
+      Description: 'Maintenance window to fetch combined XML file'
+      Duration: 1
+      # EndDate: String
+      Name: !Sub ${ServiceName}-PSCCMainWindow
+      Schedule: rate(7 days)
+      # Schedule: rate(5 minutes)
+      # ScheduleOffset: Integer
+      ScheduleTimezone: 'US/Central'
+      StartDate: '2022-03-08T21:30:00-06:00'
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackTag
+          Value: !Ref StackTag
+        - Key: StackName
+          Value: !Ref AWS::StackName
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-maintenancewindowtarget.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ssm-maintenancewindowtarget-targets.html
+  PSCCMaintTarget:
+    Type: AWS::SSM::MaintenanceWindowTarget
+    Properties:
+      Description: Hybrid Worker Target
+      Name: !Sub ${ServiceName}-HybridWorkerTarget
+      OwnerInformation: PSCC SSM XML Sourcing
+      ResourceType: INSTANCE
+      Targets:
+      - Key: tag:type
+        Values:
+        - hybridworker
+      WindowId: !Ref PSCCMaintWindow
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-maintenancewindowtask.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ssm-maintenancewindowtask-taskinvocationparameters.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ssm-maintenancewindowtask-maintenancewindowruncommandparameters.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ssm-maintenancewindowtask-cloudwatchoutputconfig.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ssm-maintenancewindowtask-notificationconfig.html
+  # https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_SendCommand.html
+  # https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-maintenance-permissions.html#maintenance-window-tasks-service-role
+  # https://docs.aws.amazon.com/systems-manager/latest/userguide/monitoring-sns-notifications.html
+  # https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-maintenance-perm-console.html
+  PSCCMaintWindowRunCommandTask:
+    Type: 'AWS::SSM::MaintenanceWindowTask'
+    Properties:
+      CutoffBehavior: CANCEL_TASK
+      Description: TBD
+      # LoggingInfo:
+      #   LoggingInfo
+      MaxConcurrency: 1
+      MaxErrors: 1
+      Name: !Sub ${ServiceName}-XMLSourcingTask
+      Priority: 0
+      ServiceRoleArn: !GetAtt PSCCMaintenanceWindowTaskRole.Arn
+      Targets:
+        - Key: WindowTargetIds
+          Values:
+            - !Ref PSCCMaintTarget
+      TaskArn: AWS-RunPowerShellScript
+      TaskInvocationParameters:
+        MaintenanceWindowRunCommandParameters:
+          CloudWatchOutputConfig:
+            CloudWatchLogGroupName: !Ref PSCCSSMRunCommandLogGroup
+            CloudWatchOutputEnabled: true
+          Comment: This is a comment
+          # DocumentHash: String
+          # DocumentHashType: String
+          # DocumentVersion: String
+          NotificationConfig:
+            NotificationArn: !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:alertTopic
+            NotificationEvents:
+              - TimedOut
+              - Cancelled
+              - Failed
+            NotificationType: Command
+          # OutputS3BucketName: !Ref PSCCSSMLogBucket
+          # OutputS3KeyPrefix: PSCC
+          Parameters:
+            executionTimeout:
+              - '3600'
+            commands:
+              - !Sub if(-not(Test-Path 'C:\${ServiceName}\FinalZip\${ServiceName}.zip')){throw 'Cannot find zip file'}
+              - !Sub
+                - 'aws s3 cp "C:\${ServiceName}\FinalZip\${ServiceName}.zip" "s3://${bucketName}"'
+                - bucketName:
+                    'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
+            workingDirectory:
+              - ""
+          ServiceRoleArn: !GetAtt PSCCSSMMaintenanceWindowTaskCommandRole.Arn
+          TimeoutSeconds: 300
+      # TaskParameters: Json
+      TaskType: RUN_COMMAND
+      WindowId: !Ref PSCCMaintWindow
+
+  # #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
+  PSCCSSMRunCommandLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      # KmsKeyId: String
+      LogGroupName: '/aws/ssm/PSCCSSMRunCommandLogGroup'
+      RetentionInDays: 30
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackTag
+          Value: !Ref StackTag
+        - Key: StackName
+          Value: !Ref AWS::StackName
+
+Outputs:
+  PSCCMaintWindowID:
+    Description: ID of PSCCMaintWindow
+    Value: !Ref PSCCMaintWindow
+    Export:
+      Name: !Sub ${ServiceName}-PSCCMaintWindowID
+
+  PSCCMaintTargetID:
+    Description: ID of PSCCMaintTarget
+    Value: !Ref PSCCMaintTarget
+
+  PSCCMaintWindowRunCommandTaskID:
+    Description: ID of PSCCMaintWindowRunCommandTask
+    Value: !Ref PSCCMaintWindowRunCommandTask
