@@ -7,9 +7,13 @@
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-including-branches
 name: ActionsTest-Windows-pwsh-Build
-on: [push, pull_request]
-  branches-ignore:
-    - 'pipeline'
+on:
+  pull_request:
+    branches-ignore:
+      - 'pipeline'
+  push:
+    branches-ignore:
+      - 'pipeline'
 jobs:
   test:
     name: Run Tests
