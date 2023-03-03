@@ -297,10 +297,15 @@ Resources:
         # OriginGroups:
         #   OriginGroups
         Origins:
-          - DomainName: !GetAtt "PSCCFinalXMLBucket.DomainName"
-            Id: s3origin
+          - Id: s3origin
+            DomainName: !GetAtt PSCCFinalXMLBucket.DomainName
             S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${PSCCCloudFrontOriginAccessIdentity}"
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !GetAtt PSCCCloudFrontOriginAccessControl.Id
+          # - DomainName: !GetAtt "PSCCFinalXMLBucket.DomainName"
+          #   Id: s3origin
+          #   S3OriginConfig:
+          #     OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${PSCCCloudFrontOriginAccessIdentity}"
         PriceClass: PriceClass_100
         # Restrictions:
         #   Restrictions
