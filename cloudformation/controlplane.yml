@@ -16,10 +16,6 @@ Parameters:
     Type: String
     Description: The name of the service being deployed.
 
-  StackTag:
-    Type: String
-    Description: An environment tag for this stack. Used to differentiate what resource need or should be created.
-
   ArtifactS3Bucket:
     Type: String
     Description: S3 Bucket for CodePipeline Artifacts
@@ -39,12 +35,10 @@ Resources:
       TimeoutInMinutes: 25 #make sure it can actually complete in this time period
       Parameters: #much match the parameters of nested template
         ServiceName: !Ref ServiceName
-        StackTag: !Ref StackTag
+        ResourceType: prod
       Tags:
         - Key: ServiceName
           Value: !Ref ServiceName
-        - Key: StackTag
-          Value: !Ref StackTag
         - Key: StackName
           Value: !Ref AWS::StackName
 
@@ -56,11 +50,9 @@ Resources:
       TimeoutInMinutes: 15 #make sure it can actually complete in this time period
       Parameters: #much match the parameters of nested template
         ServiceName: !Ref ServiceName
-        StackTag: !Ref StackTag
+        ResourceType: prod
       Tags:
         - Key: ServiceName
           Value: !Ref ServiceName
-        - Key: StackTag
-          Value: !Ref StackTag
         - Key: StackName
           Value: !Ref AWS::StackName

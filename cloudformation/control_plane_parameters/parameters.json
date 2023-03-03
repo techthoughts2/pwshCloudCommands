@@ -1,7 +1,6 @@
 {
     "Parameters": {
         "ServiceName": "pwshcloudcommands",
-        "StackTag": "production",
         "ArtifactS3Bucket": "will be replaced during CodeBuild process",
         "ArtifactS3KeyPrefix": "will be replaced during CodeBuild process"
     }
