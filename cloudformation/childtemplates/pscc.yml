@@ -103,21 +103,21 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Action:
-              - s3:GetObject
-            Effect: Allow
+          - Sid: 'AllowCloudFrontServicePrincipalReadOnly'
+            Effect: 'Allow'
             Principal:
-              AWS:
-                !Join
-                - ''
-                - -  'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity '
-                  -  !Ref PSCCCloudFrontOriginAccessIdentity
-            Resource: !Join
-            - ''
-            - - !GetAtt
-                - PSCCFinalXMLBucket
-                - Arn
-              - /*
+              Service: 'cloudfront.amazonaws.com'
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:${AWS::Partition}:s3:::${PSCCFinalXMLBucket}/*'
+            Condition:
+              StringEquals:
+                'AWS:SourceArn': !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${PSCCCloudFrontDistribution}'
+          - Sid: 'AllowLegacyOAIReadOnly'
+            Effect: 'Allow'
+            Principal:
+              AWS: !Sub 'arn:${AWS::Partition}:iam::cloudfront:user/CloudFront Origin Access Identity ${PSCCCloudFrontOriginAccessIdentity}'
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:${AWS::Partition}:s3:::${PSCCFinalXMLBucket}/*'
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html
@@ -154,8 +154,8 @@ Resources:
       # LoggingConfiguration:
       #   DestinationBucketName: !Ref StaticWebSiteLoggingBucket
       #   LogFilePrefix: '/logs/website/'
-      # MetricsConfigurations:
-      #   - MetricsConfiguration
+      MetricsConfigurations:
+        - Id: EntireBucket
       # NotificationConfiguration:
       #   TopicConfigurations:
       #     -
@@ -208,6 +208,20 @@ Resources:
             Action: 's3:PutObject'
             Resource:
               - !Sub 'arn:aws:s3:::${PSCCCloudFrontLogBucket}/AWSLogs/${AWS::AccountId}/*'
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-originaccesscontrol.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-originaccesscontrol-originaccesscontrolconfig.html
+  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
+  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-origin.html
+  PSCCCloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: pwshCloudCommands CloudFront Origin Access Control
+        Name: pscc-origin-access-control
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-PSCCCloudFrontOriginAccessIdentity.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-PSCCCloudFrontOriginAccessIdentity-PSCCCloudFrontOriginAccessIdentityconfig.html

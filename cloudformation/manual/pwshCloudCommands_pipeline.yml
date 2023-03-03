@@ -53,7 +53,7 @@ Parameters:
 
   BranchName:
     Type: String
-    Default: main
+    Default: pipeline
     Description: The name of the branch where source changes are to be detected.
 
   CodeBuildTimeoutInMinutes:
@@ -226,8 +226,8 @@ Resources:
           Value: !Ref ServiceName
         - Key: StackName
           Value: !Ref AWS::StackName
-        # - Key: ResourceType
-        #   Value: !Ref ResourceType
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-alias.html
   KMSAlias:

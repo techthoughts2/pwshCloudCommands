@@ -37,6 +37,7 @@
         "xmldatafiles"
     ],
     "cSpell.enableFiletypes": [
+        "!yaml",
         "powershell"
     ]
 }
