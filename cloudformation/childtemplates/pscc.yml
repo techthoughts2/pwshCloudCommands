@@ -112,12 +112,12 @@ Resources:
             Condition:
               StringEquals:
                 'AWS:SourceArn': !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${PSCCCloudFrontDistribution}'
-          - Sid: 'AllowLegacyOAIReadOnly'
-            Effect: 'Allow'
-            Principal:
-              AWS: !Sub 'arn:${AWS::Partition}:iam::cloudfront:user/CloudFront Origin Access Identity ${PSCCCloudFrontOriginAccessIdentity}'
-            Action: 's3:GetObject'
-            Resource: !Sub 'arn:${AWS::Partition}:s3:::${PSCCFinalXMLBucket}/*'
+          # - Sid: 'AllowLegacyOAIReadOnly'
+          #   Effect: 'Allow'
+          #   Principal:
+          #     AWS: !Sub 'arn:${AWS::Partition}:iam::cloudfront:user/CloudFront Origin Access Identity ${PSCCCloudFrontOriginAccessIdentity}'
+          #   Action: 's3:GetObject'
+          #   Resource: !Sub 'arn:${AWS::Partition}:s3:::${PSCCFinalXMLBucket}/*'
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html
@@ -225,11 +225,11 @@ Resources:
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-PSCCCloudFrontOriginAccessIdentity.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-PSCCCloudFrontOriginAccessIdentity-PSCCCloudFrontOriginAccessIdentityconfig.html
-  PSCCCloudFrontOriginAccessIdentity:
-    Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Ref PSCCFinalXMLBucket
+  # PSCCCloudFrontOriginAccessIdentity:
+  #   Type: "AWS::CloudFront::CloudFrontOriginAccessIdentity"
+  #   Properties:
+  #     CloudFrontOriginAccessIdentityConfig:
+  #       Comment: !Ref PSCCFinalXMLBucket
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-distributionconfig.html
