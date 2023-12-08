@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updated README to reference new badge urls for Github actions
     - Updated `settings.json` for tab requirements to support Readthedocs
     - Added `SECURITY.md`
+    - Updated `tasks.json` for cleaner references and additional tasks
 
 ## [0.8.0]
 
