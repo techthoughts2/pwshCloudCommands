@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updated `settings.json` for tab requirements to support Readthedocs
     - Added `SECURITY.md`
     - Updated `tasks.json` for cleaner references and additional tasks
+    - Updated `LICENSE` year
 
 ## [0.8.0]
 
