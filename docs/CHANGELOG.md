@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         - updated actions from `v2` to `v3`
     - Moved CHANGELOG from `.github` to `docs`
     - `actions_bootstrap.ps1` - bumped module versions to latest
+    - All Infra/Infrastructure references changed to Integration
 - Misc
     - Updated README to reference new badge urls for Github actions
     - Updated `settings.json` for tab requirements to support Readthedocs
