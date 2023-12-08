@@ -35,12 +35,12 @@ InModuleScope 'pwshCloudCommands' {
 
             It 'Should process by default' {
                 Invoke-XMLDataCheck
-                Assert-MockCalled Invoke-XMLDataCheck -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-XMLDataCheck -Scope It -Exactly -Times 1
             } #it
 
             It 'Should not process on explicit request for confirmation (-Confirm)' {
                 { Invoke-XMLDataCheck -Confirm }
-                Assert-MockCalled Invoke-XMLDataCheck -Scope It -Exactly -Times 0
+                Should -Invoke -CommandName Invoke-XMLDataCheck -Scope It -Exactly -Times 0
             } #it
 
             It 'Should not process on implicit request for confirmation (ConfirmPreference)' {
@@ -48,12 +48,12 @@ InModuleScope 'pwshCloudCommands' {
                     $ConfirmPreference = 'Low'
                     Invoke-XMLDataCheck
                 }
-                Assert-MockCalled Invoke-XMLDataCheck -Scope It -Exactly -Times 0
+                Should -Invoke -CommandName Invoke-XMLDataCheck -Scope It -Exactly -Times 0
             } #it
 
             It 'Should not process on explicit request for validation (-WhatIf)' {
                 { Invoke-XMLDataCheck -WhatIf }
-                Assert-MockCalled Invoke-XMLDataCheck -Scope It -Exactly -Times 0
+                Should -Invoke -CommandName Invoke-XMLDataCheck -Scope It -Exactly -Times 0
             } #it
 
             It 'Should not process on implicit request for validation (WhatIfPreference)' {
@@ -61,13 +61,13 @@ InModuleScope 'pwshCloudCommands' {
                     $WhatIfPreference = $true
                     Invoke-XMLDataCheck
                 }
-                Assert-MockCalled Invoke-XMLDataCheck -Scope It -Exactly -Times 0
+                Should -Invoke -CommandName Invoke-XMLDataCheck -Scope It -Exactly -Times 0
             } #it
 
             It 'Should process on force' {
                 $ConfirmPreference = 'Medium'
                 Invoke-XMLDataCheck -Force
-                Assert-MockCalled Invoke-XMLDataCheck -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-XMLDataCheck -Scope It -Exactly -Times 1
             } #it
 
         } #context_shouldprocess
