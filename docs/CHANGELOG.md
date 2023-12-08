@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Module Changes
+    - Updated module requirement for `Convert` from `0.6.0` to `1.5.0`
 - Build Updates
     - Updated all Github action files to:
         - support ignore certain files for Readthedocs implementation
