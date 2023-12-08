@@ -125,6 +125,89 @@ InModuleScope 'pwshCloudCommands' {
                 Invoke-XMLDataCheck -Force | Should -BeExactly $true
             } #it
 
+            It 'should not run commands if the data file is not confirmed' {
+                Mock -CommandName Confirm-DataLocation -MockWith {
+                    $false
+                } #endMock
+                Mock -CommandName Confirm-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Mock -CommandName Get-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Mock -CommandName Expand-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Invoke-XMLDataCheck -Force
+                Should -Invoke -CommandName Confirm-XMLDataSet -Scope It -Exactly -Times 0
+                Should -Invoke -CommandName Get-XMLDataSet -Scope It -Exactly -Times 0
+                Should -Invoke -CommandName Expand-XMLDataSet -Scope It -Exactly -Times 0
+            } #it
+
+            It 'should run Confirm-XMLDataSet if the data location is confirmed' {
+                Mock -CommandName Confirm-DataLocation -MockWith {
+                    $true
+                } #endMock
+                Invoke-XMLDataCheck -Force
+                Should -Invoke -CommandName Confirm-XMLDataSet -Scope It -Exactly -Times 1
+            } #it
+
+            It 'should not run Get-XMLDataSet if the data set is confirmed' {
+                Mock -CommandName Confirm-DataLocation -MockWith {
+                    $true
+                } #endMock
+                Mock -CommandName Confirm-XMLDataSet -MockWith {
+                    $true
+                } #endMock
+                Invoke-XMLDataCheck -Force
+                Should -Invoke -CommandName Confirm-XMLDataSet -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Get-XMLDataSet -Scope It -Exactly -Times 0
+            } #it
+
+            It 'should run Get-XMLDataSet if the data set is not confirmed' {
+                Mock -CommandName Confirm-DataLocation -MockWith {
+                    $true
+                } #endMock
+                Mock -CommandName Confirm-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Invoke-XMLDataCheck -Force
+                Should -Invoke -CommandName Confirm-XMLDataSet -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Get-XMLDataSet -Scope It -Exactly -Times 1
+            } #it
+
+            It 'should not run Expand-XMLDataSet if the data can not be retrieved' {
+                Mock -CommandName Confirm-DataLocation -MockWith {
+                    $true
+                } #endMock
+                Mock -CommandName Confirm-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Mock -CommandName Get-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Invoke-XMLDataCheck -Force
+                Should -Invoke -CommandName Confirm-XMLDataSet -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Get-XMLDataSet -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Expand-XMLDataSet -Scope It -Exactly -Times 0
+            } #it
+
+            It 'should run Expand-XMLDataSet if the data can be retrieved' {
+                Mock -CommandName Confirm-DataLocation -MockWith {
+                    $true
+                } #endMock
+                Mock -CommandName Confirm-XMLDataSet -MockWith {
+                    $false
+                } #endMock
+                Mock -CommandName Get-XMLDataSet -MockWith {
+                    $true
+                } #endMock
+                Invoke-XMLDataCheck -Force
+                Should -Invoke -CommandName Confirm-XMLDataSet -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Get-XMLDataSet -Scope It -Exactly -Times 1
+                Should -Invoke -CommandName Expand-XMLDataSet -Scope It -Exactly -Times 1
+            } #it
+
         } #context_Success
     } #describe_Invoke-XMLDataCheck
 } #inModule

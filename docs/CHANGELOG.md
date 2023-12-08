@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Module Changes
     - Updated module requirement for `Convert` from `0.6.0` to `1.5.0`
+    - Minor updates to `Invoke-XMLDataCheck` for code readability
 - Build Updates
     - Updated all Github action files to:
         - support ignore certain files for Readthedocs implementation
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `actions_bootstrap.ps1` - bumped module versions to latest
     - All Infra/Infrastructure references changed to Integration
     - Removed all test case uses of `Assert-MockCalled`
+    - Added additional unit tests for `Invoke-XMLDataCheck`
 - Misc
     - Updated README to reference new badge urls for Github actions
     - Updated `settings.json` for tab requirements to support Readthedocs
