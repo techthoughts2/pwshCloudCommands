@@ -12,6 +12,7 @@
     "powershell.codeFormatting.preset": "Stroustrup",
     "cSpell.words": [
         "ACCOUNTID",
+        "autopagination",
         "Backoff",
         "bucketname",
         "buildspec",
@@ -21,6 +22,7 @@
         "controlplane",
         "Datapoints",
         "datapull",
+        "datetime",
         "Deduplication",
         "discoverability",
         "dotnetcore",
@@ -42,6 +44,7 @@
         "pwshcloudcommands",
         "Redrive",
         "sqseval",
+        "testbucket",
         "xmldatafiles"
     ],
     "cSpell.enableFiletypes": [
