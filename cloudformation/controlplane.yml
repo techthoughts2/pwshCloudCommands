@@ -16,11 +16,11 @@ Parameters:
     Type: String
     Description: The name of the service being deployed.
 
-  LMFunctionS3KeyPubXMLMonitor:
+  LMFunctionS3KeypwshCCPubXMLMonitor:
     Type: String
     Description: S3 Key for the PubXMLMonitor Lambda function(s) zip file
 
-  LMFunctionHandlerPubXMLMonitor:
+  LMFunctionHandlerpwshCCPubXMLMonitor:
     Type: String
     Description: PubXMLMonitor Lambda HANDLER provided by New-AWSPowerShellLambdaPackage during build
 
@@ -74,8 +74,8 @@ Resources:
       Parameters: #much match the parameters of nested template
         ServiceName: !Ref ServiceName
         LambdaS3BucketName: !Ref ArtifactS3Bucket
-        LMFunctionS3KeyPubXMLMonitor: !Ref LMFunctionS3KeyPubXMLMonitor
-        LMFunctionHandlerPubXMLMonitor: !Ref LMFunctionHandlerPubXMLMonitor
+        LMFunctionS3KeypwshCCPubXMLMonitor: !Ref LMFunctionS3KeypwshCCPubXMLMonitor
+        LMFunctionHandlerpwshCCPubXMLMonitor: !Ref LMFunctionHandlerpwshCCPubXMLMonitor
         ResourceType: prod
       Tags:
         - Key: ServiceName
