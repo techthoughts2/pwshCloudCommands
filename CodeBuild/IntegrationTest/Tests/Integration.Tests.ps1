@@ -49,4 +49,20 @@ Describe -Name 'Infrastructure Tests' -Fixture {
 
     } #context_pscc_ssm.yml
 
+    Context -Name 'pscc_alarms.yml' -Fixture {
+
+        It -Name 'Should create a pwshCCPubXMLMonitorAlarmARN' -Test {
+            $assertion = ($cfnExports | Where-Object { $_.Name -eq "$ServiceName-pwshCCPubXMLMonitorAlarmARN" }).Value
+            $expected = 'arn:aws:cloudwatch:{0}:{1}:*' -f $env:AWSRegion, $env:AWSAccountId
+            $assertion | Should -BeLike $expected
+        } #it
+
+        It -Name 'Should create a pwshCCPubXMLMonitorARN' -Test {
+            $assertion = ($cfnExports | Where-Object { $_.Name -eq "$ServiceName-pwshCCPubXMLMonitorARN" }).Value
+            $expected = 'arn:aws:lambda:{0}:{1}:*' -f $env:AWSRegion, $env:AWSAccountId
+            $assertion | Should -BeLike $expected
+        } #it
+
+    } #context_pscc_alarms.yml
+
 } #describe_infra_tests
