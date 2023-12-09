@@ -52,7 +52,7 @@ Resources:
       Description: 'Determines age of PubXML and sends to CloudWatch Metric'
       Environment:
         Variables:
-          S3_BUCKET_NAME: !ImportValue PubXMLDataBN
+          S3_BUCKET_NAME: !ImportValue pwshcloudcommands-PSCCFinalXMLBucket
           SERVICE_NAME: !Ref ServiceName
       # EphemeralStorage: EphemeralStorage
       # EventInvokeConfig: EventInvokeConfiguration
