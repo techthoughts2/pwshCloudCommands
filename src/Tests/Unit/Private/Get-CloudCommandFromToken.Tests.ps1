@@ -421,7 +421,7 @@ InModuleScope 'pwshCloudCommands' {
 
             It 'should run the commands the expected number of times' {
                 Get-CloudCommandFromToken -Tokens $tokens
-                Assert-MockCalled -CommandName Search-XMLDataSet -Times 12 -Scope It
+                Should -Invoke -CommandName Search-XMLDataSet -Times 12 -Scope It
             } #it
 
             It 'should return null if no results are found' {

@@ -18,6 +18,7 @@ InModuleScope 'pwshCloudCommands' {
             $PathToAssets = [System.IO.Path]::Combine('..', 'asset')
         } #beforeAll
         Context 'Find-CloudCommand' {
+
             It 'should return expected results for a function query' {
                 $eval = Find-CloudCommand -Query Write-S3Object -Filter AWS
                 $eval.Name | Should -BeExactly 'Write-S3Object'

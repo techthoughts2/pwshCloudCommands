@@ -49,20 +49,27 @@ function Invoke-XMLDataCheck {
             $ConfirmPreference = 'None'
 
             $dataOutputDir = Confirm-DataLocation
+
             if ($dataOutputDir -eq $true) {
+
                 $confirm = Confirm-XMLDataSet
-                if (-not ($Confirm -eq $true)) {
+                if (($Confirm -eq $false)) {
+
                     $retrieve = Get-XMLDataSet
                     if ($retrieve -eq $true) {
+
                         $expand = Expand-XMLDataSet
-                        if (-not ($expand -eq $true)) {
+                        if ($expand -eq $false) {
                             $results = $false
                         }
+
                     }
                     else {
                         $results = $false
                     }
+
                 } #if_Confirm
+
             } #if_data_output
             else {
                 $results = $false
