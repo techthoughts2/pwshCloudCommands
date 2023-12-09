@@ -123,7 +123,7 @@ Resources:
       AlarmActions:
         - !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:alertTopic
       AlarmDescription: Alarms if the PubXML file is more than 8 days old.
-      AlarmName: PubXMLMonitor
+      AlarmName: pwshCCPubXMLMonitor
       ComparisonOperator: GreaterThanOrEqualToThreshold
       # DatapointsToAlarm: Integer
       # EvaluateLowSampleCountPercentile: String
