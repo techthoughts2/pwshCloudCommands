@@ -73,7 +73,7 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - CloudWatchPutMetricPolicy: {}
         - S3CrudPolicy:
-            BucketName: !ImportValue PubXMLDataBN
+            BucketName: !ImportValue pwshcloudcommands-PSCCFinalXMLBucket
         - SSMParameterReadPolicy:
             ParameterName: telegramtoken
         - SSMParameterReadPolicy:
