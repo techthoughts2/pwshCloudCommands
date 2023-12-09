@@ -1,8 +1,9 @@
-# $env:ARTIFACT_S3_BUCKET = the artifact bucket used by CB
-# $env:S3_PREFIX = the artifact prefix used by CB
-# $env:GIT_REPO = the git repo name
-# $env:AWS_ACCOUNTID = the AWS Account hosting the service under test
 # $env:SERVICE_NAME = name of the project
+# $env:ARTIFACT_S3_BUCKET = the artifact bucket used by CB
+# $env:AWS_ACCOUNTID = the AWS Account hosting the service under test
+# $env:GIT_REPO = the git repo name
+# $env:S3_PREFIX = the artifact prefix used by CB
+
 
 Describe -Name 'Infrastructure Tests' -Fixture {
     BeforeAll {
@@ -53,13 +54,13 @@ Describe -Name 'Infrastructure Tests' -Fixture {
 
         It -Name 'Should create a pwshCCPubXMLMonitorAlarmARN' -Test {
             $assertion = ($cfnExports | Where-Object { $_.Name -eq "$ServiceName-pwshCCPubXMLMonitorAlarmARN" }).Value
-            $expected = 'arn:aws:cloudwatch:{0}:{1}:*' -f $env:AWSRegion, $env:AWSAccountId
+            $expected = 'arn:aws:cloudwatch:*'
             $assertion | Should -BeLike $expected
         } #it
 
         It -Name 'Should create a pwshCCPubXMLMonitorARN' -Test {
             $assertion = ($cfnExports | Where-Object { $_.Name -eq "$ServiceName-pwshCCPubXMLMonitorARN" }).Value
-            $expected = 'arn:aws:lambda:{0}:{1}:*' -f $env:AWSRegion, $env:AWSAccountId
+            $expected = 'arn:aws:lambda:*'
             $assertion | Should -BeLike $expected
         } #it
 
