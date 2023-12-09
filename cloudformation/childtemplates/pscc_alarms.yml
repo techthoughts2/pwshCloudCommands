@@ -1,0 +1,161 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: 'AUTOMATED: pwshCloudCommands - alarms deployment'
+
+Transform: 'AWS::Serverless-2016-10-31'
+
+Parameters:
+  ServiceName:
+    Type: String
+    Description: The name of the service being deployed. Used for Developer AWS Account Resource Names.
+
+  LambdaS3BucketName:
+    Type: String
+    Description: The S3 Bucket holding the Lambda code
+
+  LMFunctionS3KeyPubXMLMonitor:
+    Type: String
+    Description: S3 Key for the PubXMLMonitor Lambda function(s) zip file
+
+  LMFunctionHandlerPubXMLMonitor:
+    Type: String
+    Description: PubXMLMonitor Lambda HANDLER provided by New-AWSPowerShellLambdaPackage during build
+
+  ResourceType:
+    Type: String
+    Description: Determine the type of resource that will be deployed
+    AllowedValues:
+      - core
+      - dev
+      - test
+      - prod
+
+Resources:
+  # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+  # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-eventsource.html
+  # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-cloudwatchevent.html
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-events-rule.html#cfn-events-rule-eventpattern
+  pwshCCPubXMLMonitor:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      # Architectures: x86_64
+      # AssumeRolePolicyDocument: JSON
+      # AutoPublishAlias: String
+      # AutoPublishCodeSha256: String
+      # CodeSigningConfigArn: String
+      CodeUri:
+        Bucket: !Ref LambdaS3BucketName
+        Key: !Ref LMFunctionS3KeyPubXMLMonitor
+      # DeadLetterQueue: Map | DeadLetterQueue
+      # DeploymentPreference: DeploymentPreference
+      Description: 'Determines age of PubXML and sends to CloudWatch Metric'
+      Environment:
+        Variables:
+          S3_BUCKET_NAME: !ImportValue PubXMLDataBN
+          SERVICE_NAME: !Ref ServiceName
+      # EphemeralStorage: EphemeralStorage
+      # EventInvokeConfig: EventInvokeConfiguration
+      # Events: EventSource
+      # FileSystemConfigs: List
+      # FunctionName:
+      # FunctionUrlConfig: FunctionUrlConfig
+      Handler: !Ref LMFunctionHandlerPubXMLMonitor
+      # ImageConfig: ImageConfig
+      # ImageUri: String
+      # InlineCode: String
+      # KmsKeyArn: String
+      # Layers: List
+      MemorySize: 768
+      # PackageType: String
+      # PermissionsBoundary: String
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - CloudWatchPutMetricPolicy: {}
+        - S3CrudPolicy:
+            BucketName: !ImportValue PubXMLDataBN
+        - SSMParameterReadPolicy:
+            ParameterName: telegramtoken
+        - SSMParameterReadPolicy:
+            ParameterName: telegramchannel
+      # ProvisionedConcurrencyConfig: ProvisionedConcurrencyConfig
+      # ReservedConcurrentExecutions: Integer
+      # Role: String
+      # RolePath: String
+      Runtime: dotnet6
+      # RuntimeManagementConfig: RuntimeManagementConfig
+      # SnapStart: SnapStart
+      Tags:
+        ServiceName: !Ref ServiceName
+        StackName: !Ref AWS::StackName
+        ResourceType: !Ref ResourceType
+      Events:
+        RateSchedule:
+          Type: Schedule
+          Properties:
+            Enabled: true
+            Schedule: 'rate(1 day)'
+      Timeout: 60
+
+  #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
+  pwshCCPubXMLMonitorLogGroup:
+    Type: AWS::Logs::LogGroup
+    DependsOn: pwshCCPubXMLMonitor
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      # KmsKeyId: String
+      LogGroupName: !Sub '/aws/lambda/${pwshCCPubXMLMonitor}'
+      RetentionInDays: 14
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-alarm.html
+  pwshCCPubXMLMonitorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:alertTopic
+      AlarmDescription: Alarms if the PubXML file is more than 8 days old.
+      AlarmName: PubXMLMonitor
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      # DatapointsToAlarm: Integer
+      # EvaluateLowSampleCountPercentile: String
+      Dimensions:
+        - Name: PubXML
+          Value: DaysOld
+      EvaluationPeriods: 1
+      # ExtendedStatistic: String
+      # InsufficientDataActions:
+      #   - String
+      MetricName: PubXMLAge
+      # Metrics:
+      #   - MetricDataQuery
+      Namespace: !Ref ServiceName
+      # OKActions:
+      #   - String
+      Period: 3600
+      Statistic: Maximum
+      Threshold: 8
+      # ThresholdMetricId: String
+      TreatMissingData: notBreaching
+      # Unit: String
+
+Outputs:
+  pwshCCPubXMLMonitorARN:
+    Description: Arn for PubXMLMonitor Lambda
+    Value: !GetAtt pwshCCPubXMLMonitor.Arn
+    Export:
+      Name: !Sub ${ServiceName}-pwshCCPubXMLMonitorARN
+
+  pwshCCPubXMLMonitorAlarmARN:
+    Description: PubXMLMonitorAlarm Alarm ARN
+    Value: !GetAtt pwshCCPubXMLMonitorAlarm.Arn
+    Export:
+      Name: !Sub ${ServiceName}-pwshCCPubXMLMonitorAlarmARN

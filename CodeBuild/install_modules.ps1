@@ -7,7 +7,7 @@
     need to specify each module and version that is required for installation. You also need to specify
     which version of that module should be installed. Additionally, you will need to specify the S3 bucket
     location where that module currently resides, so that it can be downloaded and installed into the build
-    container at runtime. This neccessitates that you download and upload your required modules to S3 prior to
+    container at runtime. This necessitates that you download and upload your required modules to S3 prior to
     the build being executed.
 .EXAMPLE
     Save-Module -Name Pester -RequiredVersion 4.4.5 -Path C:\RequiredModules
@@ -32,13 +32,13 @@ $modulesToInstall = [System.Collections.ArrayList]::new()
 # https://github.com/pester/Pester
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'Pester'
-            ModuleVersion = '5.4.0'
+            ModuleVersion = '5.5.0'
             BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'InvokeBuild'
-            ModuleVersion = '5.10.2'
+            ModuleVersion = '5.10.4'
             BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
@@ -49,23 +49,42 @@ $null = $modulesToInstall.Add(([PSCustomObject]@{
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
+            ModuleName    = 'PoshGram'
+            ModuleVersion = '2.3.0'
+            BucketName    = 'PSGallery'
+            KeyPrefix     = ''
+        }))
+$null = $modulesToInstall.Add(([PSCustomObject]@{
+            ModuleName    = 'AWSLambdaPSCore'
+            ModuleVersion = '3.0.1.0'
+            BucketName    = 'PSGallery'
+            KeyPrefix     = ''
+        }))
+$null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWS.Tools.Common'
-            ModuleVersion = '4.1.275'
+            ModuleVersion = '4.1.472'
             BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWS.Tools.CloudFormation'
-            ModuleVersion = '4.1.275'
+            ModuleVersion = '4.1.472'
             BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWS.Tools.S3'
-            ModuleVersion = '4.1.275'
+            ModuleVersion = '4.1.472'
             BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
+$null = $modulesToInstall.Add(([PSCustomObject]@{
+            ModuleName    = 'AWS.Tools.SimpleSystemsManagement'
+            ModuleVersion = '4.1.472'
+            BucketName    = 'PSGallery'
+            KeyPrefix     = ''
+        }))
+
 
 if ($galleryDownload -eq $false) {
 
