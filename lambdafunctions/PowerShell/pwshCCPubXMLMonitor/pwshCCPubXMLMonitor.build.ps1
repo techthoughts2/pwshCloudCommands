@@ -57,7 +57,7 @@ Enter-Build {
         $script:CodeBuildRoot = $env:CODEBUILD_SRC_DIR
     }
     $script:ModulesRoot = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath 'Modules'
-    $script:CFNParameterFilePath = Join-Path -Path $script:CodeBuildRoot -ChildPath 'CloudFormation'
+    $script:CFNParameterFilePath = Join-Path -Path $script:CodeBuildRoot -ChildPath 'cloudformation'
 
     if (-not(Test-Path -Path $script:CFNParameterFilePath)) {
         throw ('Unable to find the cloudformation Path: {0}' -f $script:CFNParameterFilePath)
