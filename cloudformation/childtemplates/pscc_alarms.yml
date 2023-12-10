@@ -137,7 +137,7 @@ Resources:
       MetricName: PubXMLAge
       # Metrics:
       #   - MetricDataQuery
-      Namespace: !Ref ServiceName
+      Namespace: pwshCloudCommands
       # OKActions:
       #   - String
       Period: 3600
