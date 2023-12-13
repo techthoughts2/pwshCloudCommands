@@ -179,6 +179,8 @@ Resources:
                       "region": "us-west-2",
                       "period": 86400,
                       "stat": "Maximum",
+                      "start": "-P30D",
+                      "end": "P0D",
                       "annotations": {
                           "horizontal": [
                               {
