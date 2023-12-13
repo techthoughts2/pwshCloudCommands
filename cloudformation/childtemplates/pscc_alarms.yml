@@ -147,6 +147,61 @@ Resources:
       TreatMissingData: notBreaching
       # Unit: String
 
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudwatch-dashboard.html
+  pwshCCPubXMLMonitorDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub '${ServiceName}-pwshCCPubXMLMonitorDashboard'
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+              {
+                  "type": "metric",
+                  "x": 0,
+                  "y": 0,
+                  "width": 8,
+                  "height": 12,
+                  "properties": {
+                      "metrics": [
+                          [
+                              "pwshCloudCommands",
+                              "PubXMLAge",
+                              "PubXML",
+                              "DaysOld",
+                              {
+                                  "region": "us-west-2",
+                                  "label": "Data Cache Age (Days)"
+                              }
+                          ]
+                      ],
+                      "view": "timeSeries",
+                      "stacked": false,
+                      "region": "us-west-2",
+                      "period": 86400,
+                      "stat": "Maximum",
+                      "annotations": {
+                          "horizontal": [
+                              {
+                                  "label": "Cache > 8 Days",
+                                  "value": 8
+                              }
+                          ]
+                      },
+                      "yAxis": {
+                          "left": {
+                              "label": "Days Old",
+                              "min": 0
+                          },
+                          "right": {
+                              "label": "Date"
+                          }
+                      },
+                      "title": "pwshCloudCommands Data Cache Age Metric"
+                  }
+              }
+          ]
+        }
+
 Outputs:
   pwshCCPubXMLMonitorARN:
     Description: Arn for PubXMLMonitor Lambda
