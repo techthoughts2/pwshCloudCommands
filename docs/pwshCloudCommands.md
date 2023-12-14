@@ -2,7 +2,7 @@
 Module Name: pwshCloudCommands
 Module Guid: be3705bf-2c38-413a-8973-9e409e826d35
 Download Help Link: NA
-Help Version: 0.9.5
+Help Version: 1.0.0
 Locale: en-US
 ---
 
@@ -12,12 +12,12 @@ Search, discover, and identify PowerShell cloud commands across multiple cloud p
 
 ## pwshCloudCommands Cmdlets
 ### [Find-CloudCommand](Find-CloudCommand.md)
-Finds PowerShell cloud command(s) that match the provided query.
+Searches for PowerShell cloud commands matching a given query.
 
 ### [Get-AllCloudCommandInfo](Get-AllCloudCommandInfo.md)
-Returns module and function information for all known PowerShell cloud commands.
+Returns detailed module and function information on all available PowerShell cloud commands.
 
 ### [Get-CloudCommandFromFile](Get-CloudCommandFromFile.md)
-Evaluates PowerShell files in specified path and identifies a list of PowerShell cloud functions and their associated modules.
+Identifies PowerShell cloud functions and modules within files at a specified path.
 
 
