@@ -156,11 +156,11 @@ Resources:
         {
           "widgets": [
               {
-                  "type": "metric",
-                  "x": 0,
-                  "y": 0,
-                  "width": 8,
                   "height": 12,
+                  "width": 7,
+                  "y": 0,
+                  "x": 0,
+                  "type": "metric",
                   "properties": {
                       "metrics": [
                           [
@@ -179,7 +179,7 @@ Resources:
                       "region": "us-west-2",
                       "period": 86400,
                       "stat": "Maximum",
-                      "start": "-P30D",
+                      "start": "-P90D",
                       "end": "P0D",
                       "annotations": {
                           "horizontal": [
@@ -199,6 +199,42 @@ Resources:
                           }
                       },
                       "title": "pwshCloudCommands Data Cache Age Metric"
+                  }
+              },
+              {
+                  "height": 12,
+                  "width": 6,
+                  "y": 0,
+                  "x": 7,
+                  "type": "metric",
+                  "properties": {
+                      "metrics": [
+                          [
+                              "AWS/CloudFront",
+                              "Requests",
+                              "Region",
+                              "Global",
+                              "DistributionId",
+                              "E2C5YCYVS84449",
+                              {
+                                  "region": "us-east-1"
+                              }
+                          ]
+                      ],
+                      "view": "timeSeries",
+                      "stacked": false,
+                      "region": "us-west-2",
+                      "period": 86400,
+                      "stat": "Sum",
+                      "start": "-P90D",
+                      "end": "P0D",
+                      "title": "Data Cache Download Requests",
+                      "yAxis": {
+                          "left": {
+                              "label": "Download Count",
+                              "min": 0
+                          }
+                      }
                   }
               }
           ]
