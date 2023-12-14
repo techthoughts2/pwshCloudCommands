@@ -1,6 +1,8 @@
 {
     "Parameters": {
         "ServiceName": "pwshcloudcommands",
+        "LMFunctionS3KeypwshCCPubXMLMonitor": "< This value is replace by the UnitTestAndBuild CodeBuild step in the Lambda's build file >",
+        "LMFunctionHandlerpwshCCPubXMLMonitor": "< This value is replace by the UnitTestAndBuild CodeBuild step in the Lambda's build file >",
         "ArtifactS3Bucket": "will be replaced during CodeBuild process",
         "ArtifactS3KeyPrefix": "will be replaced during CodeBuild process"
     }

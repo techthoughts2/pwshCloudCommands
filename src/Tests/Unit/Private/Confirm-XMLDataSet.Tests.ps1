@@ -30,6 +30,7 @@ InModuleScope 'pwshCloudCommands' {
                     CreationTime    = [datetime]'01/06/20 21:17:21'
                     CreationTimeUtc = [datetime]'01/07/20 05:17:21'
                     LastAccessTime  = [datetime]'01/06/20 21:17:22'
+                    LastWriteTime   = [datetime]'01/06/20 21:17:21'
                 }
             } #endMock
             Mock -CommandName Get-Date -MockWith {
@@ -84,6 +85,7 @@ InModuleScope 'pwshCloudCommands' {
                             CreationTime    = [datetime]'01/06/20 21:17:21'
                             CreationTimeUtc = [datetime]'01/07/20 05:17:21'
                             LastAccessTime  = [datetime]'01/06/20 21:17:22'
+                            LastWriteTime   = [datetime]'01/06/20 21:17:21'
                         }
                         return $obj
                     }

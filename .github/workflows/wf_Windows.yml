@@ -5,16 +5,21 @@
 # https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
 # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-powershell
 # https://github.com/actions/upload-artifact#where-does-the-upload-go
-# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-including-branches
 name: pwshCloudCommands-Windows
 on:
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
     branches-ignore:
       - 'pipeline'
     paths-ignore:
       - '**.md'
       - 'docs/**'
   push:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
     branches-ignore:
       - 'pipeline'
     paths-ignore:
@@ -63,3 +68,4 @@ jobs:
         name: zip-archive
         path: .\src\Archive
         if-no-files-found: warn
+

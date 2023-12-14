@@ -8,7 +8,7 @@ schema: 2.0.0
 # Find-CloudCommand
 
 ## SYNOPSIS
-Finds PowerShell cloud command(s) that match the provided query.
+Searches for PowerShell cloud commands matching a given query.
 
 ## SYNTAX
 
@@ -17,22 +17,15 @@ Find-CloudCommand [-Query] <String> [[-Filter] <String>] [-AllResults] [<CommonP
 ```
 
 ## DESCRIPTION
-Performs query search on a dynamically updated cache of known PowerShell cloud commands.
-Results are returned based on provided criteria.
-Based on the query provided, a different form of search is performed.
-If a function name is provided (Verb-Noun), a function name query is performed.
-If a wildcard is provided (Ve*-Noun), a wildcard query is performed.
-Anything else is treated as a free-form query.
-Order of query efficiency is:
-1.
-Function name query
-2.
-Wildcard query
-3.
-Free-form query
-Query performance will also be greatly increased if you filter to the specific cloud platform you are using (AWS/Azure/Oracle).
-Free-form queries can generate many results and by default only the top 30 results are returned.
-Use the -AllResults parameter with free-form queries to return all results.
+This function searches a dynamically updated cache of PowerShell cloud commands,
+returning results that match specific criteria.
+The nature of the search depends on the type of query:
+    - Function Name Query: Directly uses the function name format (Verb-Noun).
+    - Wildcard Query: Utilizes wildcards (e.g., Ve*-Noun) for broader searches.
+    - Free-form Query: Handles any other text as a general search term.
+The efficiency of queries follows this order: function name, wildcard, then free-form.
+Specifying a cloud platform (AWS/Azure/Oracle) enhances performance, especially for free-form queries.
+By default, free-form queries return the top 30 results; use the -AllResults parameter to retrieve all matches.
 
 ## EXAMPLES
 
@@ -41,54 +34,54 @@ Use the -AllResults parameter with free-form queries to return all results.
 Find-CloudCommand -Query Write-S3Object -Filter AWS
 ```
 
-Search for a specific function name (Verb-Noun) and filter to AWS.
+Searches for the 'Write-S3Object' function specifically within AWS services.
 
 ### EXAMPLE 2
 ```
 Find-CloudCommand -Query New-OCIComputeInstance -Filter Oracle
 ```
 
-Search for a specific function name (Verb-Noun) and filter to Oracle.
+Looks for the 'New-OCIComputeInstance' function within Oracle cloud services.
 
 ### EXAMPLE 3
 ```
 Find-CloudCommand -Query New-MLDataSourceFromRedshift
 ```
 
-Search for a specific function name (Verb-Noun) against all cloud platforms.
+Searches for 'New-MLDataSourceFromRedshift' across all cloud platforms.
 
 ### EXAMPLE 4
 ```
 Find-CloudCommand -Query New*VM* -Filter Azure
 ```
 
-Wildcard function search that is filtered to Azure.
+Performs a wildcard search for VM-related functions within Azure.
 
 ### EXAMPLE 5
 ```
 Find-CloudCommand -Query Get*WAF*
 ```
 
-Wildcard function search against all cloud platforms.
+Uses a wildcard search for WAF-related functions across all platforms.
 
 ### EXAMPLE 6
 ```
 Find-CloudCommand -Query 'I want to create a new compute instance' -Filter Oracle
 ```
 
-Free-form query that is filtered to Oracle.
+Conducts a free-form search related to compute instances in Oracle cloud.
 
 ### EXAMPLE 7
 ```
 Find-CloudCommand -Query 'download an object from a S3 bucket' -Filter AWS -AllResults
 ```
 
-Free-form query that is filtered to AWS and returns all results.
+Executes a comprehensive free-form search for downloading objects from S3 in AWS.
 
 ## PARAMETERS
 
 ### -Query
-PowerShell cloud command search input
+Search input for PowerShell cloud commands.
 
 ```yaml
 Type: String
@@ -103,7 +96,7 @@ Accept wildcard characters: False
 ```
 
 ### -Filter
-Filter results to specific cloud platform (AWS/Azure/Oracle)
+Filters the search to a specific cloud platform (AWS/Azure/Oracle).
 
 ```yaml
 Type: String
@@ -118,7 +111,7 @@ Accept wildcard characters: False
 ```
 
 ### -AllResults
-Return all results, regardless of the number of results returned
+Retrieves all search results without limiting the number.
 
 ```yaml
 Type: SwitchParameter

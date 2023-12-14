@@ -16,6 +16,14 @@ Parameters:
     Type: String
     Description: The name of the service being deployed.
 
+  LMFunctionS3KeypwshCCPubXMLMonitor:
+    Type: String
+    Description: S3 Key for the PubXMLMonitor Lambda function(s) zip file
+
+  LMFunctionHandlerpwshCCPubXMLMonitor:
+    Type: String
+    Description: PubXMLMonitor Lambda HANDLER provided by New-AWSPowerShellLambdaPackage during build
+
   ArtifactS3Bucket:
     Type: String
     Description: S3 Bucket for CodePipeline Artifacts
@@ -50,6 +58,24 @@ Resources:
       TimeoutInMinutes: 15 #make sure it can actually complete in this time period
       Parameters: #much match the parameters of nested template
         ServiceName: !Ref ServiceName
+        ResourceType: prod
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+
+  PSCCAlarm:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: PSCC
+    Properties:
+      TemplateURL: ./childtemplates/pscc_alarms.yml
+      TimeoutInMinutes: 15 #make sure it can actually complete in this time period
+      Parameters: #much match the parameters of nested template
+        ServiceName: !Ref ServiceName
+        LambdaS3BucketName: !Ref ArtifactS3Bucket
+        LMFunctionS3KeypwshCCPubXMLMonitor: !Ref LMFunctionS3KeypwshCCPubXMLMonitor
+        LMFunctionHandlerpwshCCPubXMLMonitor: !Ref LMFunctionHandlerpwshCCPubXMLMonitor
         ResourceType: prod
       Tags:
         - Key: ServiceName

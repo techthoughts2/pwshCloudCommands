@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-AllCloudCommandInfo
 
 ## SYNOPSIS
-Returns module and function information for all known PowerShell cloud commands.
+Returns detailed module and function information on all available PowerShell cloud commands.
 
 ## SYNTAX
 
@@ -17,8 +17,10 @@ Get-AllCloudCommandInfo [[-Filter] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Returns results from the entire PowerShell cloud command catalog.
-It is recommended to use the Filter parameter to reduce the size of the result set.
+This function provides comprehensive details on modules and functions from the entire catalog
+of PowerShell cloud commands.
+To manage the volume of data returned, it's advisable to use the
+'Filter' parameter to focus on a specific cloud provider's commands.
 
 ## EXAMPLES
 
@@ -27,19 +29,19 @@ It is recommended to use the Filter parameter to reduce the size of the result s
 Get-AllCloudCommandInfo -Filter AWS
 ```
 
-Returns module and function information of all known AWS PowerShell cloud commands.
+Retrieves a complete list of modules and functions for AWS-specific PowerShell cloud commands.
 
 ### EXAMPLE 2
 ```
 Get-AllCloudCommandInfo
 ```
 
-Returns module and function information of all known PowerShell cloud commands.
+Returns information on all available PowerShell cloud commands across various cloud platforms.
 
 ## PARAMETERS
 
 ### -Filter
-Filter results to specific cloud platform (AWS/Azure/Oracle)
+Filters the search to a specific cloud platform (AWS/Azure/Oracle).
 
 ```yaml
 Type: String
