@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Minor updates to `Invoke-XMLDataCheck` for code readability
     - `Confirm-XMLDataSet` now evaluates `LastWriteTime` instead of `CreationTime` to determine cache freshness requirements
     - `Find-CloudCommand` - updated help
+    - `Get-AllCloudCommandInfo` - updated help
 - Build Updates
     - Updated all Github action files to:
         - support ignore certain files for Readthedocs implementation
