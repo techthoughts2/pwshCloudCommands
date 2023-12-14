@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added `SECURITY.md`
     - Updated `tasks.json` for cleaner references and additional tasks
     - Updated `LICENSE` year
+    - Added metric dashboards to docs section
 
 ## [0.8.0]
 
