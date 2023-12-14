@@ -2,13 +2,10 @@
 
 ## Reporting a Vulnerability
 
-<<<<<<< HEAD
-=======
 <!--- Use this section to tell people how to report a vulnerability.
 
 Tell them where to go, how often they can expect to get an update on a reported vulnerability, what to expect if the vulnerability is accepted or declined, etc. -->
 
->>>>>>> Enhancements
 If you discover a vulnerability in pwshCloudCommands, please follow the _following process_:
 
 1. Open a generic bug issue advising you have discovered a vulnerability.

@@ -10,38 +10,38 @@
 
 site_name: pwshCloudCommands
 # site_url:
-# repo_url:
+repo_url: https://github.com/techthoughts2/pwshCloudCommands
 # repo_name:
 # edit_uri: edit/main/docs/
 # edit_uri_template:
 site_description: Search, discover, and identify PowerShell cloud commands across multiple cloud providers. # meta tag to the generated HTML header
-site_author: Jake # meta tag to the generated HTML header
-# copyright:
+site_author: Jake Morrison # meta tag to the generated HTML header
+copyright: "pwshCloudCommands is licensed under the <a href='https://github.com/techthoughts2/pwshCloudCommands/blob/main/LICENSE'>MIT license"
 # remote_branch:
 # remote_name:
 # docs_dir: docs
 # site_dir:
 # extra_css:
 # extra_javascript:
-# markdown_extensions:
+markdown_extensions:
   # Python Markdown
-  # - admonition
-  # - toc:
-  #     permalink: true
+  - admonition
+  - toc:
+      permalink: true
   # code highlighting
-  # - pymdownx.highlight:
-  #     use_pygments: true
-  # - pymdownx.highlight:
-  #     anchor_linenums: true
-  # - pymdownx.inlinehilite
-  # - pymdownx.snippets
-  # - pymdownx.superfences
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 
 # extra_templates:
 # extra:
 theme:
   name: material
-  # language: en
+  language: en
   # custom_dir: overrides
   features:
     # - navigation.tabs
@@ -75,7 +75,11 @@ theme:
     #     name: Switch to light mode
 nav:
   - Home: index.md
+  - Functions:
+    - Find-CloudCommand: Find-CloudCommand.md
+    - Get-AllCloudCommandInfo: Get-AllCloudCommandInfo.md
+    - Get-CloudCommandFromFile: Get-CloudCommandFromFile.md
+  - Metrics: pwshCloudCommand-Metrics.md
+  - FAQ: pwshCloudCommand-FAQ.md
+  - Cache Design: pwshCloudCommands_cache_workflow.md
   - Change Log: CHANGELOG.md
-  # - Functions:
-  #   - Function1: functions/function1.md
-
