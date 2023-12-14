@@ -12,4 +12,4 @@ This workflow continuously updates the known cache of PowerShell Cloud commands 
 
 ## Design Diagram
 
-![pwshCloudCommands PowerShell Cloud Commands data cache creation](../media/pwshCloudCommands_datapull.png)
+![pwshCloudCommands PowerShell Cloud Commands data cache creation](assets/pwshCloudCommands_datapull.png)
