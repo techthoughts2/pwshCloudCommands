@@ -8,11 +8,11 @@
 
 ## What is pwshCloudCommands?
 
-pwshCloudCommands is a PowerShell module offering capabilities to search for and analyze PowerShell cloud commands without needing to install cloud modules. It features a two-pronged approach to discovering commands: users can query cloud commands from AWS, Azure, and Oracle, or they can scan their local project files to accurately determine the cloud commands and modules being utilized.
+pwshCloudCommands is a PowerShell module that simplifies the search and analysis of cloud-specific PowerShell commands, without the need to install cloud modules locally. It provides a dual discovery method: querying cloud commands across AWS, Azure, and Oracle, and scanning local project files to identify which cloud commands and modules are being utilized.
 
 ## Why pwshCloudCommands?
 
-To aid in the discovery and analysis of cloud-specific PowerShell commands, `pwshCloudCommands` streamlines your workflow when working with PowerShell in the cloud.
+To aid in the discovery and analysis of cloud-specific PowerShell commands, pwshCloudCommands streamlines your workflow when working with PowerShell in the cloud.
 
 - **Find Cloud Commands Without Local Installs**: You can effortlessly search for any cloud command across AWS, Azure, and Oracle without installing the corresponding modules locally, reducing overhead and simplifying cloud command management.
 - **Enjoy Advanced Search Capabilities**: Unlike the PowerShell Gallery, this module supports free-form searches. This is particularly useful when you're not sure of the exact command or syntax, offering an intuitive and flexible way to find what you need.
