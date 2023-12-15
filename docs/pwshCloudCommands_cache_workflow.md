@@ -8,7 +8,7 @@ This workflow continuously updates the known cache of PowerShell Cloud commands 
 
 ## Deployment Stack
 
-* [Cloudformation for cache deployment](../cloudformation)
+* [CloudFormation for cache deployment](https://github.com/techthoughts2/pwshCloudCommands/tree/main/cloudformation)
 
 ## Design Diagram
 
