@@ -4,8 +4,8 @@
 
 ### Why would I use this vs Get-Command?
 
-pwshCloudCommands is not a replacement for ```Get-Command```. The primary difference is that you do not have to have a module installed on your local device in order to use pwshCloudCommands. This enables you search for and identify PowerShell cloud commands across multiple cloud platforms without having to install any modules. This also enables you to scan directories and identify cloud commands used without necessarily having those modules on your local device.
+While `Get-Command` is a powerful tool, pwshCloudCommands offers unique advantages for working with cloud-specific PowerShell commands. The key benefit is the ability to search for and identify cloud commands across multiple cloud platforms without the need to install their respective modules locally. Additionally, it allows you to scan directories and accurately detect the usage of cloud commands, regardless of whether those modules are present on your local system.
 
 ### How current is the PowerShell cloud command cache data?
 
-Cloud changes frequently, and so do PowerShell cloud commands. The [Cache creation component](pwshCloudCommands_cache_workflow.md) ensures that the data cache is kept current. There is approximately a 1 week delay in the project cache data for all supported cloud platforms.
+Given the rapid pace of change in cloud services, pwshCloudCommands is designed to keep up with the latest PowerShell cloud commands. The [cache](pwshCloudCommands_cache_workflow.md) is systematically updated to reflect the most recent commands, with a standard latency of about one week.
