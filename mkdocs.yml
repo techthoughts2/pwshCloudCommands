@@ -79,7 +79,7 @@ nav:
     - Find-CloudCommand: Find-CloudCommand.md
     - Get-AllCloudCommandInfo: Get-AllCloudCommandInfo.md
     - Get-CloudCommandFromFile: Get-CloudCommandFromFile.md
-  - Metrics: pwshCloudCommand-Metrics.md
-  - FAQ: pwshCloudCommand-FAQ.md
+  - Metrics: pwshCloudCommands-Metrics.md
+  - FAQ: pwshCloudCommands-FAQ.md
   - Cache Design: pwshCloudCommands_cache_workflow.md
   - Change Log: CHANGELOG.md
