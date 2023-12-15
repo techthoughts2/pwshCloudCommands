@@ -51,16 +51,45 @@ Parameters:
     Type: String
     Description: The name of the GitHub user or organization who owns the GitHub repository.
 
-  GitHubBranchName:
+  BranchName:
     Type: String
-    Default: main
+    Default: pipeline
     Description: The name of the branch where source changes are to be detected.
 
+  CodeBuildTimeoutInMinutes:
+    Type: Number
+    Default: 30
+    Description: The number of minutes before a CodeBuild build will timeout.
+
+  # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-compute-types.html
+  CodeBuildEnvironment:
+    Type: String
+    Default: LINUX_CONTAINER
+    Description: The type of build environment.
+    AllowedValues:
+      - WINDOWS_SERVER_2019_CONTAINER
+      - WINDOWS_CONTAINER
+      - LINUX_CONTAINER
+
+  # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-compute-types.html
+  CodeBuildComputeType:
+    Type: String
+    Default: BUILD_GENERAL1_SMALL
+    Description: The size of the CodeBuild instance. (Windows Containers do NOT support small)
+    AllowedValues:
+      - BUILD_GENERAL1_SMALL
+      - BUILD_GENERAL1_MEDIUM
+      - BUILD_GENERAL1_LARGE
+
+  # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
   CodeBuildImage:
     Type: String
-    Description: AWS CodeBuild Image Identifier
-    Default: aws/codebuild/standard:5.0
-    AllowedPattern: ^aws\/codebuild\/standard:\d.\d$
+    Default: aws/codebuild/standard:6.0
+    Description: AWS CodeBuild image selection
+    AllowedValues:
+      - aws/codebuild/standard:6.0
+      - aws/codebuild/amazonlinux2-x86_64-standard:4.0
+      - aws/codebuild/windows-base:2019-2.0
 
   PathToUnitTestAndBuildBuildSpecTemplate:
     Type: String
@@ -82,6 +111,16 @@ Parameters:
     Description: 'The GitHub Repository path to the Control Plane Parameters JSON file'
     Default: cloudformation/control_plane_parameters/parameters.json
 
+  ResourceType:
+    Type: String
+    Default: prod
+    Description: Determine the type of resource that will be deployed
+    AllowedValues:
+      - core
+      - dev
+      - test
+      - prod
+
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -95,11 +134,18 @@ Metadata:
           - CodeStarSourceConnection
           - GitHubRepositoryName
           - GitHubOwner
-          - GitHubBranchName
+          - BranchName
+      - Label:
+          default: CodeBuild
+        Parameters:
+          # - PathToBuildSpecTemplate
+          - CodeBuildTimeoutInMinutes
+          - CodeBuildEnvironment
+          - CodeBuildComputeType
+          - CodeBuildImage
       - Label:
           default: Pipeline Configuration
         Parameters:
-          - CodeBuildImage
           - PathToUnitTestAndBuildBuildSpecTemplate
           - PathToIntegrationTestBuildSpecTemplate
           - PathToControlPlaneTemplate
@@ -113,10 +159,16 @@ Metadata:
         default: GitHub Repository Name
       GitHubOwner:
         default: GitHub User Name
-      GitHubBranchName:
+      BranchName:
         default: GitHub Branch Name
+      CodeBuildTimeoutInMinutes:
+        default: CodeBuild Timeout in minutes
+      CodeBuildEnvironment:
+        default: CodeBuild Environment
+      CodeBuildComputeType:
+        default: CodeBuild Compute Type
       CodeBuildImage:
-        default: CodeBuild Image Identifier
+        default: CodeBuild Image
 
 Resources:
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-key.html
@@ -133,7 +185,7 @@ Resources:
           - Sid: Allows administration of the KMS Key
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+              AWS: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
             Action:
               - 'kms:CancelKeyDeletion'
               - 'kms:Create*'
@@ -151,11 +203,13 @@ Resources:
               - 'kms:Revoke*'
               - 'kms:ScheduleKeyDeletion'
               - 'kms:Update*'
+              - 'kms:TagResource'
+              - 'kms:UntagResource'
             Resource: '*'
           - Effect: Allow
             Principal:
               AWS:
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+                - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
             Action:
               - 'kms:Encrypt'
               - 'kms:Decrypt'
@@ -172,6 +226,8 @@ Resources:
           Value: !Ref ServiceName
         - Key: StackName
           Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kms-alias.html
   KMSAlias:
@@ -235,6 +291,8 @@ Resources:
           Value: !Ref ServiceName
         - Key: StackName
           Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
       # VersioningConfiguration:
       #   VersioningConfiguration
       # WebsiteConfiguration:
@@ -252,10 +310,10 @@ Resources:
             Effect: Allow
             Principal:
               AWS:
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+                - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root'
             Resource:
-              - !Sub 'arn:aws:s3:::${pwshCloudCommandsArtifactS3Bucket}'
-              - !Sub 'arn:aws:s3:::${pwshCloudCommandsArtifactS3Bucket}/*'
+              - !Sub 'arn:${AWS::Partition}:s3:::${pwshCloudCommandsArtifactS3Bucket}'
+              - !Sub 'arn:${AWS::Partition}:s3:::${pwshCloudCommandsArtifactS3Bucket}/*'
           # - Sid: DenyUnEncryptedObjectUploads
           #   Effect: Deny
           #   Principal: '*'
@@ -287,13 +345,21 @@ Resources:
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub '${ServiceName}-CodeBuildRole'
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: 'Allow'
             Principal:
               AWS:
-                - !Sub 'arn:aws:iam::${AWS::AccountId}:root' # Allow assuming this role for local developer testing
+                - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:root' # Allow assuming this role for local developer testing
               Service:
                 - 'codebuild.amazonaws.com'
             Action:
@@ -319,7 +385,9 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+                  - !GetAtt UnitTestAndBuildLogGroup.Arn
+                  - !GetAtt IntegrationTestProjectLogGroup.Arn
               - Effect: 'Allow'
                 Action:
                   - 's3:PutObject'
@@ -327,9 +395,9 @@ Resources:
                   - 's3:GetObjectVersion'
                   - 's3:ListBucket'
                 Resource:
-                  - !Sub 'arn:aws:s3:::codepipeline-${AWS::Region}-*'
-                  - !Sub 'arn:aws:s3:::${pwshCloudCommandsArtifactS3Bucket}'
-                  - !Sub 'arn:aws:s3:::${pwshCloudCommandsArtifactS3Bucket}/*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::codepipeline-${AWS::Region}-*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pwshCloudCommandsArtifactS3Bucket}'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pwshCloudCommandsArtifactS3Bucket}/*'
               - Effect: 'Allow'
                 Action:
                   - 's3:GetObject'
@@ -355,63 +423,23 @@ Resources:
                 Resource:
                   - '*'
 
-  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
-  PSModuleAccess:
-    Type: AWS::IAM::Policy
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
+  UnitTestAndBuildLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
-      Roles:
-        - !Ref CodeBuildRole
-      PolicyName: 'PSModuleAccess'
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:GetAccessPoint
-              - s3:GetLifecycleConfiguration
-              - s3:GetBucketTagging
-              - s3:GetInventoryConfiguration
-              - s3:GetObjectVersionTagging
-              - s3:ListBucketVersions
-              - s3:GetBucketLogging
-              - s3:GetAccelerateConfiguration
-              - s3:GetBucketPolicy
-              - s3:GetObjectVersionTorrent
-              - s3:GetObjectAcl
-              - s3:GetEncryptionConfiguration
-              - s3:GetBucketObjectLockConfiguration
-              - s3:GetBucketRequestPayment
-              - s3:GetAccessPointPolicyStatus
-              - s3:GetObjectVersionAcl
-              - s3:GetObjectTagging
-              - s3:GetMetricsConfiguration
-              - s3:GetBucketPublicAccessBlock
-              - s3:GetBucketPolicyStatus
-              - s3:ListBucketMultipartUploads
-              - s3:GetObjectRetention
-              - s3:GetBucketWebsite
-              - s3:GetJobTagging
-              - s3:ListAccessPoints
-              - s3:ListJobs
-              - s3:GetBucketVersioning
-              - s3:GetBucketAcl
-              - s3:GetObjectLegalHold
-              - s3:GetBucketNotification
-              - s3:GetReplicationConfiguration
-              - s3:ListMultipartUploadParts
-              - s3:GetObject
-              - s3:GetObjectTorrent
-              - s3:GetAccountPublicAccessBlock
-              - s3:DescribeJob
-              - s3:GetBucketCORS
-              - s3:GetAnalyticsConfiguration
-              - s3:GetObjectVersionForReplication
-              - s3:GetBucketLocation
-              - s3:GetAccessPointPolicy
-              - s3:GetObjectVersion"
-            Resource:
-              - 'arn:aws:s3:::ps-invoke-modules'
-              - 'arn:aws:s3:::ps-invoke-modules/*'
+      # DataProtectionPolicy: Json
+      # KmsKeyId: String
+      LogGroupName: !Sub ${ServiceName}-UnitTestAndBuildLogGroup
+      RetentionInDays: 7
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codebuild-project.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-environment.html
@@ -435,8 +463,8 @@ Resources:
       EncryptionKey: !GetAtt KMSKey.Arn
       Environment:
         # Certificate:
-        ComputeType: BUILD_GENERAL1_SMALL #3GB Memory | 2 vCPU | 64GB HD
-        Type: LINUX_CONTAINER
+        ComputeType: !Ref CodeBuildComputeType
+        Type: !Ref CodeBuildEnvironment
         Image: !Ref CodeBuildImage
         EnvironmentVariables:
           - Name: ARTIFACT_S3_BUCKET
@@ -460,6 +488,11 @@ Resources:
       #   - Source
       # SecondarySourceVersions:
       #   - ProjectSourceVersion
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref UnitTestAndBuildLogGroup
+          Status: ENABLED
+          # StreamName: String
       ServiceRole: !GetAtt CodeBuildRole.Arn
       Source:
         # Auth:
@@ -485,6 +518,26 @@ Resources:
           Value: !Ref ServiceName
         - Key: StackName
           Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
+
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
+  IntegrationTestProjectLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      # DataProtectionPolicy: Json
+      # KmsKeyId: String
+      LogGroupName: !Sub ${ServiceName}-IntegrationTestProjectLogGroup
+      RetentionInDays: 7
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codebuild-project.html
   IntegrationTestProject:
@@ -502,8 +555,8 @@ Resources:
       EncryptionKey: !GetAtt KMSKey.Arn
       Environment:
         # Certificate:
-        ComputeType: BUILD_GENERAL1_SMALL #3GB Memory | 2 vCPU | 64GB HD
-        Type: LINUX_CONTAINER
+        ComputeType: !Ref CodeBuildComputeType
+        Type: !Ref CodeBuildEnvironment
         Image: !Ref CodeBuildImage
         EnvironmentVariables:
           - Name: ARTIFACT_S3_BUCKET
@@ -516,7 +569,11 @@ Resources:
             Value: !Ref 'AWS::AccountId'
           - Name: SERVICE_NAME
             Value: !Ref ServiceName
-      # LogsConfig:
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Ref IntegrationTestProjectLogGroup
+          Status: ENABLED
+          # StreamName: String
       Name: !Sub '${ServiceName}-IntegrationTest'
       # QueuedTimeoutInMinutes: Integer
       # SecondaryArtifacts:
@@ -550,12 +607,21 @@ Resources:
           Value: !Ref ServiceName
         - Key: StackName
           Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
   pwshCloudCommandsCodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub '${ServiceName}-CodePipelineRole'
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -599,8 +665,8 @@ Resources:
                 Action:
                   - s3:*
                 Resource:
-                  - !Sub 'arn:aws:s3:::${pwshCloudCommandsArtifactS3Bucket}'
-                  - !Sub 'arn:aws:s3:::${pwshCloudCommandsArtifactS3Bucket}/*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pwshCloudCommandsArtifactS3Bucket}'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${pwshCloudCommandsArtifactS3Bucket}/*'
               - Effect: Allow
                 Action:
                   - iam:ListRoles
@@ -613,10 +679,10 @@ Resources:
                   - codebuild:StartBuild
                   - codebuild:BatchGetBuilds
                 Resource:
-                  - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${UnitTestAndBuildProject}
-                  - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:build/${UnitTestAndBuildProject}:*
-                  - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${IntegrationTestProject}
-                  - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:build/${IntegrationTestProject}:*
+                  - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${UnitTestAndBuildProject}
+                  - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:build/${UnitTestAndBuildProject}:*
+                  - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:project/${IntegrationTestProject}
+                  - !Sub arn:${AWS::Partition}:codebuild:${AWS::Region}:${AWS::AccountId}:build/${IntegrationTestProject}:*
               - Effect: Allow
                 Action:
                   - kms:*
@@ -633,10 +699,9 @@ Resources:
                 Resource: !Ref CodeStarSourceConnection
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
-  pwshCloudCommandsCloudFormationRole:
+  CloudFormationRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${ServiceName}-CloudFormationRole'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -660,6 +725,14 @@ Resources:
                 Action:
                   - '*'
                 Resource: '*'
+      RoleName: !Sub '${ServiceName}-Pipeline-CloudFormationRole'
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codepipeline-pipeline.html
   pwshCloudCommandsPipeline:
@@ -675,6 +748,13 @@ Resources:
       Name: !Sub '${GitHubRepositoryName}-CodePipeline'
       RestartExecutionOnUpdate: false
       RoleArn: !GetAtt pwshCloudCommandsCodePipelineRole.Arn
+      Tags:
+        - Key: ServiceName
+          Value: !Ref ServiceName
+        - Key: StackName
+          Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codepipeline-pipeline-stages.html
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codepipeline-pipeline-stages-actions.html
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codepipeline-pipeline-stages-actions-actiontypeid.html
@@ -684,7 +764,7 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: Source
+            - Name: GitHubSource
               ActionTypeId:
                 Version: '1'
                 Owner: AWS
@@ -693,59 +773,61 @@ Resources:
               Configuration:
                 ConnectionArn: !Ref CodeStarSourceConnection
                 FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepositoryName}'
-                BranchName: !Ref GitHubBranchName
+                BranchName: !Ref BranchName
               # InputArtifacts:
               #   - InputArtifact
               # Namespace: String
               # OutputArtifactFormat: "CODE_ZIP"
               OutputArtifacts:
-                - Name: GitHubSourceCode
+                - Name: GitHubSource
               # Region: String
               # RoleArn: String
               RunOrder: 1
         - Name: Build
           Actions:
             - Name: CodeBuild
+              InputArtifacts:
+                - Name: GitHubSource
               ActionTypeId:
                 Category: Build
                 Owner: AWS
                 Version: '1'
                 Provider: CodeBuild
+              OutputArtifacts:
+                - Name: CFNTemplateArtifact
               Configuration:
                 ProjectName:
                   Ref: UnitTestAndBuildProject
-              InputArtifacts:
-                - Name: GitHubSourceCode
               # Namespace: String
-              OutputArtifacts:
-                - Name: CFNTemplateArtifact
               # Region: String
               # RoleArn: String
               RunOrder: 1
         - Name: Deploy
           Actions:
             - Name: DeployPrimaryControlPlane
+              InputArtifacts:
+                - Name: CFNTemplateArtifact
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
                 Version: '1'
                 Provider: CloudFormation
+              OutputArtifacts:
+                - Name: CreatedPrimaryControlPlaneStack
               Configuration:
                 ActionMode: CREATE_UPDATE
-                RoleArn: !GetAtt pwshCloudCommandsCloudFormationRole.Arn
+                RoleArn: !GetAtt CloudFormationRole.Arn
                 Capabilities: CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
                 StackName: !Ref ServiceName
                 TemplateConfiguration: !Sub 'CFNTemplateArtifact::${PathToControlPlaneParametersJson}'
                 TemplatePath: !Sub 'CFNTemplateArtifact::${PathToControlPlaneTemplate}'
-              InputArtifacts:
-                - Name: CFNTemplateArtifact
               # Namespace: String
-              OutputArtifacts:
-                - Name: CreatedPrimaryControlPlaneStack
               # Region: String
               RoleArn: !GetAtt pwshCloudCommandsCodePipelineRole.Arn
               RunOrder: 1
             - Name: ValidateStack
+              InputArtifacts:
+                - Name: GitHubSource
               ActionTypeId:
                 Category: Test
                 Owner: AWS
@@ -753,19 +835,12 @@ Resources:
                 Provider: CodeBuild
               Configuration:
                 ProjectName: !Ref IntegrationTestProject
-              InputArtifacts:
-                - Name: GitHubSourceCode
               # Namespace: String
               OutputArtifacts:
                 - Name: ValidatedStack
               # Region: String
               # RoleArn: String
               RunOrder: 2
-      Tags:
-        - Key: ServiceName
-          Value: !Ref ServiceName
-        - Key: StackName
-          Value: !Ref AWS::StackName
 
 Outputs:
   KMSKeyID:
@@ -812,7 +887,7 @@ Outputs:
 
   pwshCloudCommandsCloudFormationRoleArn:
     Description: Arn of the pwshCloudCommandsCloudFormationRole IAM Role
-    Value: !GetAtt pwshCloudCommandsCloudFormationRole.Arn
+    Value: !GetAtt CloudFormationRole.Arn
 
   pwshCloudCommandsPipeline:
     Description: Pipeline Name

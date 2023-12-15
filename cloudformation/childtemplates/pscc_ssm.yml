@@ -8,51 +8,56 @@ Parameters:
     Type: String
     Description: The name of the service being deployed. Used for Developer AWS Account Resource Names.
 
-  StackTag:
+  ResourceType:
     Type: String
-    Description: An environment tag for this stack. Used to differentiate what resource need or should be created.
+    Description: Determine the type of resource that will be deployed
+    AllowedValues:
+      - core
+      - dev
+      - test
+      - prod
 
 Resources:
 
-  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
-  SSMHybridWorkerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ssm.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Path: /
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/CloudWatchFullAccess
-      Policies:
-        - PolicyName: PSCCFinalXMLAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:PutObject
-                  - s3:ListBucketMultipartUploads
-                  - s3:DeleteObjectVersion
-                  - s3:ListBucketVersions
-                  - s3:ListBucket
-                  - s3:DeleteObject
-                  - s3:ListMultipartUploadParts
-                Resource:
-                  - !Sub
-                    - 'arn:aws:s3:::${FinalXMLBucket}'
-                    - FinalXMLBucket:
-                        'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
-                  - !Sub
-                    - 'arn:aws:s3:::${FinalXMLBucket}/*'
-                    - FinalXMLBucket:
-                        'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
+  # # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+  # SSMHybridWorkerRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: ssm.amazonaws.com
+  #           Action:
+  #             - sts:AssumeRole
+  #     Path: /
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  #       - arn:aws:iam::aws:policy/CloudWatchFullAccess
+  #     Policies:
+  #       - PolicyName: PSCCFinalXMLAccess
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - s3:PutObject
+  #                 - s3:ListBucketMultipartUploads
+  #                 - s3:DeleteObjectVersion
+  #                 - s3:ListBucketVersions
+  #                 - s3:ListBucket
+  #                 - s3:DeleteObject
+  #                 - s3:ListMultipartUploadParts
+  #               Resource:
+  #                 - !Sub
+  #                   - 'arn:aws:s3:::${FinalXMLBucket}'
+  #                   - FinalXMLBucket:
+  #                       'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
+  #                 - !Sub
+  #                   - 'arn:aws:s3:::${FinalXMLBucket}/*'
+  #                   - FinalXMLBucket:
+  #                       'Fn::ImportValue': !Sub ${ServiceName}-PSCCFinalXMLBucket
 
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
@@ -107,7 +112,7 @@ Resources:
                 Action:
                   - sns:Publish
                 Resource:
-                  - !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:alertTopic
+                  - !Sub arn:${AWS::Partition}:sns:us-west-2:${AWS::AccountId}:alertTopic
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-maintenancewindow.html
   PSCCMaintWindow:
@@ -127,10 +132,10 @@ Resources:
       Tags:
         - Key: ServiceName
           Value: !Ref ServiceName
-        - Key: StackTag
-          Value: !Ref StackTag
         - Key: StackName
           Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-maintenancewindowtarget.html
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ssm-maintenancewindowtarget-targets.html
@@ -183,7 +188,7 @@ Resources:
           # DocumentHashType: String
           # DocumentVersion: String
           NotificationConfig:
-            NotificationArn: !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:alertTopic
+            NotificationArn: !Sub arn:${AWS::Partition}:sns:us-west-2:${AWS::AccountId}:alertTopic
             NotificationEvents:
               - TimedOut
               - Cancelled
@@ -211,6 +216,8 @@ Resources:
   # #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-loggroup.html
   PSCCSSMRunCommandLogGroup:
     Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
     Properties:
       # KmsKeyId: String
       LogGroupName: '/aws/ssm/PSCCSSMRunCommandLogGroup'
@@ -218,10 +225,10 @@ Resources:
       Tags:
         - Key: ServiceName
           Value: !Ref ServiceName
-        - Key: StackTag
-          Value: !Ref StackTag
         - Key: StackName
           Value: !Ref AWS::StackName
+        - Key: ResourceType
+          Value: !Ref ResourceType
 
 Outputs:
   PSCCMaintWindowID:

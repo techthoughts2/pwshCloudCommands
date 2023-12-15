@@ -1,21 +1,22 @@
 <#
 .SYNOPSIS
-    Evaluates PowerShell files in specified path and identifies a list of PowerShell cloud functions and their associated modules.
+    Identifies PowerShell cloud functions and modules within files at a specified path.
 .DESCRIPTION
-    Discovers all PowerShell files in the specified path.
-    Parses each file and identifies all PowerShell cloud functions and their associated modules.
+    This function scans and analyzes PowerShell files in a given directory or path.
+    It parses each file to identify all PowerShell cloud functions and their associated modules,
+    providing a comprehensive overview of cloud-related commands used in the project.
 .EXAMPLE
     $psCloud = Get-CloudCommandFromFile -Path "$env:HOME\pathToEvaluate"
     $psCloud
 
-    Returns a list of PowerShell cloud functions and their associated modules found in files in the specified path.
+    Examines the specified path for PowerShell files, returning a list of cloud functions and their modules found in these files.
 .EXAMPLE
     $psCloud = Get-CloudCommandFromFile -Path "$env:HOME\pathToEvaluate"
     $psCloud.CloudCommands.ModuleName | Select-Object -Unique
 
-    Returns a list of unique module names found in use in files in the specified path.
+    After analyzing files at the specified path, this returns a list of unique module names utilized in those files.
 .PARAMETER Path
-    File or Folder Path to evaluate.
+    File or directory path to be evaluated for cloud command usage.
 .OUTPUTS
     System.Management.Automation.PSCustomObject
 .NOTES
@@ -28,7 +29,7 @@ function Get-CloudCommandFromFile {
     param (
         [Parameter(Mandatory = $true,
             Position = 0,
-            HelpMessage = 'File or Folder Path to evaluate')]
+            HelpMessage = 'File or directory path to be evaluated for cloud command usage')]
         [string]
         $Path
     )

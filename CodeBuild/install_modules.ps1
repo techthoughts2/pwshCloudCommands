@@ -7,7 +7,7 @@
     need to specify each module and version that is required for installation. You also need to specify
     which version of that module should be installed. Additionally, you will need to specify the S3 bucket
     location where that module currently resides, so that it can be downloaded and installed into the build
-    container at runtime. This neccessitates that you download and upload your required modules to S3 prior to
+    container at runtime. This necessitates that you download and upload your required modules to S3 prior to
     the build being executed.
 .EXAMPLE
     Save-Module -Name Pester -RequiredVersion 4.4.5 -Path C:\RequiredModules
@@ -20,11 +20,11 @@
 #>
 
 
+$galleryDownload = $true
+
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 $VerbosePreference = 'SilentlyContinue'
-
-$galleryDownload = $false # set to false to download from S3
 
 # List of PowerShell Modules required for the build
 # The AWS PowerShell Modules are added below, based on the $PSEdition
@@ -32,106 +32,113 @@ $modulesToInstall = [System.Collections.ArrayList]::new()
 # https://github.com/pester/Pester
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'Pester'
-            ModuleVersion = '5.3.1'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '5.5.0'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'InvokeBuild'
-            ModuleVersion = '5.9.7'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '5.10.4'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'PSScriptAnalyzer'
-            ModuleVersion = '1.20.0'
-            BucketName    = 'ps-invoke-modules'
-            KeyPrefix     = ''
-        }))
-$null = $modulesToInstall.Add(([PSCustomObject]@{
-            ModuleName    = 'Convert'
-            ModuleVersion = '0.6.0'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '1.21.0'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'PoshGram'
-            ModuleVersion = '2.0.0'
-            BucketName    = 'ps-invoke-modules'
-            KeyPrefix     = ''
-        }))
-$null = $modulesToInstall.Add(([PSCustomObject]@{
-            ModuleName    = 'PackageManagement'
-            ModuleVersion = '1.4.7'
-            BucketName    = 'ps-invoke-modules'
-            KeyPrefix     = ''
-        }))
-$null = $modulesToInstall.Add(([PSCustomObject]@{
-            ModuleName    = 'PowerShellGet'
-            ModuleVersion = '2.2.5'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '2.3.0'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWSLambdaPSCore'
-            ModuleVersion = '3.0.0.0'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '3.0.1.0'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWS.Tools.Common'
-            ModuleVersion = '4.1.30.0'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '4.1.472'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWS.Tools.CloudFormation'
-            ModuleVersion = '4.1.30.0'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '4.1.472'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
             ModuleName    = 'AWS.Tools.S3'
-            ModuleVersion = '4.1.30.0'
-            BucketName    = 'ps-invoke-modules'
+            ModuleVersion = '4.1.472'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 $null = $modulesToInstall.Add(([PSCustomObject]@{
-            ModuleName    = 'AWS.Tools.SecretsManager'
-            ModuleVersion = '4.1.30.0'
-            BucketName    = 'ps-invoke-modules'
-            KeyPrefix     = ''
-        }))
-$null = $modulesToInstall.Add(([PSCustomObject]@{
-            ModuleName    = 'AWS.Tools.SQS'
-            ModuleVersion = '4.1.30.0'
-            BucketName    = 'ps-invoke-modules'
+            ModuleName    = 'AWS.Tools.SimpleSystemsManagement'
+            ModuleVersion = '4.1.472'
+            BucketName    = 'PSGallery'
             KeyPrefix     = ''
         }))
 
-$tempPath = [System.IO.Path]::GetTempPath()
-
-if ($PSVersionTable.Platform -eq 'Win32NT') {
-    $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'WindowsPowerShell', 'Modules')
-    if ($PSEdition -eq 'Core') {
-        $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'PowerShell', 'Modules')
-    }
-    else {
-        $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'WindowsPowerShell', 'Modules')
-    }
-}
-elseif ($PSVersionTable.Platform -eq 'Unix') {
-    $moduleInstallPath = [System.IO.Path]::Combine('/', 'usr', 'local', 'share', 'powershell', 'Modules')
-}
-elseif ($PSEdition -eq 'Desktop') {
-    $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'WindowsPowerShell', 'Modules')
-}
-else {
-    throw 'Unrecognized OS platform'
-}
 
 if ($galleryDownload -eq $false) {
-    'Installing PowerShell Modules from S3'
+
+    $tempPath = [System.IO.Path]::GetTempPath()
+
+    if ($PSVersionTable.Platform -eq 'Win32NT') {
+        $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'WindowsPowerShell', 'Modules')
+        if ($PSEdition -eq 'Core') {
+            $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'PowerShell', 'Modules')
+            # Add the AWSPowerShell.NetCore Module
+            # $null = $modulesToInstall.Add(([PSCustomObject]@{
+            #     ModuleName    = 'AWSPowerShell.NetCore'
+            #     ModuleVersion = '3.3.604.0'
+            #     BucketName    = 'PSGallery'
+            #     KeyPrefix     = ''
+            # }))
+        }
+        else {
+            $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'WindowsPowerShell', 'Modules')
+            # Add the AWSPowerShell Module
+            # $null = $modulesToInstall.Add(([PSCustomObject]@{
+            #     ModuleName    = 'AWSPowerShell'
+            #     ModuleVersion = '3.3.604.0'
+            #     BucketName    = 'PSGallery'
+            #     KeyPrefix     = ''
+            # }))
+        }
+    }
+    elseif ($PSVersionTable.Platform -eq 'Unix') {
+        $moduleInstallPath = [System.IO.Path]::Combine('/', 'usr', 'local', 'share', 'powershell', 'Modules')
+
+        # Add the AWSPowerShell.NetCore Module
+        # $null = $modulesToInstall.Add(([PSCustomObject]@{
+        #     ModuleName    = 'AWSPowerShell.NetCore'
+        #     ModuleVersion = '3.3.604.0'
+        #     BucketName    = 'PSGallery'
+        #     KeyPrefix     = ''
+        # }))
+    }
+    elseif ($PSEdition -eq 'Desktop') {
+        $moduleInstallPath = [System.IO.Path]::Combine($env:ProgramFiles, 'WindowsPowerShell', 'Modules')
+        # Add the AWSPowerShell Module
+        # $null = $modulesToInstall.Add(([PSCustomObject]@{
+        #     ModuleName    = 'AWSPowerShell'
+        #     ModuleVersion = '3.3.604.0'
+        #     BucketName    = 'PSGallery'
+        #     KeyPrefix     = ''
+        # }))
+    }
+    else {
+        throw 'Unrecognized OS platform'
+    }
+
+    'Installing PowerShell Modules'
     foreach ($module in $modulesToInstall) {
         '  - {0} {1}' -f $module.ModuleName, $module.ModuleVersion
 
@@ -163,25 +170,30 @@ if ($galleryDownload -eq $false) {
 } #if_GalleryDownload
 else {
     Get-PackageProvider -Name Nuget -ForceBootstrap | Out-Null
-    'Installing PowerShell Modules from PSGallery'
+    'Installing PowerShell Modules'
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
     # $NuGetProvider = Get-PackageProvider -Name "NuGet" -ErrorAction SilentlyContinue
     # if ( -not $NugetProvider ) {
     #     Install-PackageProvider -Name "NuGet" -Confirm:$false -Force -Verbose
     # }
     foreach ($module in $modulesToInstall) {
+        $installSplat = @{
+            Name               = $module.ModuleName
+            RequiredVersion    = $module.ModuleVersion
+            Repository         = 'PSGallery'
+            SkipPublisherCheck = $true
+            Force              = $true
+            ErrorAction        = 'Stop'
+        }
         try {
-            if ($module.ModuleName -eq 'Pester' -and $PSEdition -eq 'Desktop') {
-                Install-Module $module.ModuleName -RequiredVersion $module.ModuleVersion -Repository PSGallery -Force -SkipPublisherCheck -ErrorAction Stop
-            }
-            else {
-                Install-Module $module.ModuleName -RequiredVersion $module.ModuleVersion -Repository PSGallery -Confirm:$false -Force -ErrorAction Stop
-            }
+            Install-Module @installSplat
+            Import-Module -Name $module.ModuleName -ErrorAction Stop
+            '  - Successfully installed {0}' -f $module.ModuleName
         }
         catch {
             $message = 'Failed to install {0}' -f $module.ModuleName
             "  - $message"
-            throw $_
+            throw
         }
     }
 }
