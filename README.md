@@ -33,7 +33,7 @@ pwshCloudCommands is a PowerShell module that simplifies the search and analysis
 
 ### Documentation
 
-Documentation for pwshCloudCommands is available at: [https://psgalleryexplorer.readthedocs.io](https://pwshCloudCommands.readthedocs.io)
+Documentation for pwshCloudCommands is available at: [https://pwshCloudCommands.readthedocs.io](https://pwshCloudCommands.readthedocs.io)
 
 ### Installation
 
