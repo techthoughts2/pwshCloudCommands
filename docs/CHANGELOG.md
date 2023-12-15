@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         - Updated CodeBuild Integration tests
         - Changed alarm for cache data to reference correct SNS topic for alerts
         - Added CloudWatch dashboard for data cache age metric
+    - Added support for readthedocs
 - Misc
     - Updated README to reference new badge urls for Github actions
     - Updated `settings.json` for tab requirements to support Readthedocs
