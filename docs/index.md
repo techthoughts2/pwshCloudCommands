@@ -70,7 +70,7 @@ pwshCloudCommands utilizes a cloud-based, event-driven workflow to generate a dy
 - Fully cross-platform and can be run on Windows, Linux, and macOS
 - Module-Free Command Search: Discover PowerShell commands without the need for local module installations.
     - Exact Function Name Search: Find specific functions, like Write-S3Object.
-    - Wildcard Search: Use patterns, such as New*VM*, to locate commands.
+    - Wildcard Search: Use patterns, such as New\*VM\*, to locate commands.
     - Free-Form Search: Enter natural language queries like 'I want to create a new compute instance' for intuitive searching.
 - Complete Cache Data Dump: Access a comprehensive dump containing all known PowerShell cloud commands for detailed analysis.
 - Project File Analysis: Scan files and folders in your projects to identify used cloud functions and modules, crucial for project setup, discovery, and CI/CD pipeline integration.
