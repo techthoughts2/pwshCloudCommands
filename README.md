@@ -17,38 +17,32 @@ Search, discover, and identify PowerShell cloud commands across multiple cloud p
 
 ## Description
 
-pwshCloudCommands enables you to search for and discover PowerShell cloud commands and functions without the need to save or install modules locally.
-It uses a cloud-based, event driven workflow to generate a dynamic cache of known PowerShell cloud commands.
-This cache can be searched, queried, and leveraged to identify what functions and modules are being used inside your project.
-You can use pwshCloudCommands to:
+pwshCloudCommands is a PowerShell module that simplifies the search and analysis of cloud-specific PowerShell commands, without the need to install cloud modules locally. It provides a dual discovery method: querying cloud commands across AWS, Azure, and Oracle, and scanning local project files to identify which cloud commands and modules are being utilized.
 
-* Search for and discover PowerShell cloud commands across multiple cloud providers.
-* Scan your existing project files to identify all used PowerShell cloud commands and their corresponding module.
+### Features
 
-[pwshCloudCommands](docs/pwshCloudCommands.md) provides the following functions:
+- Fully cross-platform and can be run on Windows, Linux, and macOS
+- Module-Free Command Search: Discover PowerShell commands without the need for local module installations.
+    - Exact Function Name Search: Find specific functions, like Write-S3Object.
+    - Wildcard Search: Use patterns, such as New*VM*, to locate commands.
+    - Free-Form Search: Enter natural language queries like 'I want to create a new compute instance' for intuitive searching.
+- Complete Cache Data Dump: Access a comprehensive dump containing all known PowerShell cloud commands for detailed analysis.
+- Project File Analysis: Scan files and folders in your projects to identify used cloud functions and modules, crucial for project setup, discovery, and CI/CD pipeline integration.
 
-* [Find-CloudCommand](docs/Find-CloudCommand.md)
-* [Get-AllCloudCommandInfo](docs/Get-AllCloudCommandInfo.md)
-* [Get-CloudCommandFromFile](docs/Get-CloudCommandFromFile.md)
+## Getting Started
 
-## Why
+### Documentation
 
-Enable easier discoverability of PowerShell cloud commands.
+Documentation for pwshCloudCommands is available at: [https://psgalleryexplorer.readthedocs.io](https://pwshCloudCommands.readthedocs.io)
 
-## Installation
-
-### Prerequisites
-
-* [PowerShell 5.1](https://github.com/PowerShell/PowerShell) *(or higher version)*
-
-### Installing pwshCloudCommands via PowerShell Gallery
+### Installation
 
 ```powershell
-#from a 5.1+ PowerShell session
+# Install pwshCloudCommands from the PowerShell Gallery
 Install-Module -Name 'pwshCloudCommands' -Scope CurrentUser
 ```
 
-## Quick start
+### Quick start
 
 ```powershell
 #------------------------------------------------------------------------------------------------
@@ -83,24 +77,14 @@ Get-AllCloudCommandInfo -Filter Oracle
 #------------------------------------------------------------------------------------------------
 ```
 
-## Author
-
-[Jake Morrison](https://twitter.com/JakeMorrison) - [https://www.techthoughts.info/](https://www.techthoughts.info/)
-
 ## Notes
-
-PowerShell cloud information is provided via a [Cache creation component](docs/pwshCloudCommands_cache_workflow.md)
 
 This PowerShell project was created with [Catesta](https://github.com/techthoughts2/Catesta).
 
-## FAQ
+## Contributing
 
-[pwshCloudCommands - FAQ](docs/pwshCloudCommands-FAQ.md)
+If you'd like to contribute to pwshCloudCommands, please see the [contribution guidelines](.github/CONTRIBUTING.md).
 
 ## License
 
 This project is [licensed under the MIT License](LICENSE).
-
-## Changelog
-
-Reference the [Changelog](.github/CHANGELOG.md)
