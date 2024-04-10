@@ -106,6 +106,25 @@ function Search-XMLDataSet {
         throw
     }
 
+    # special case for Azure selection where we will also retrieve Graph Modules
+    if ($Filter -eq 'Azure') {
+        Write-Debug -Message 'Retrieving Azure Graph xml file info...'
+        $getChildItemSplat = @{
+            Path        = $xmlDataPath
+            Filter      = 'Microsoft.Graph.*'
+            ErrorAction = 'Stop'
+        }
+        try {
+            $graphFiles = Get-ChildItem @getChildItemSplat
+        }
+        catch {
+            Write-Warning -Message 'An error was encountered getting xml file info.'
+            Write-Error $_
+            throw
+        }
+        $xmlDataFiles += $graphFiles
+    }
+
     Write-Verbose -Message 'Running query...'
     if ($PSCmdlet.ParameterSetName -eq 'Function') {
         #------------------------------

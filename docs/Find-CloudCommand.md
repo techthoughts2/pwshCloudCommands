@@ -13,7 +13,8 @@ Searches for PowerShell cloud commands matching a given query.
 ## SYNTAX
 
 ```
-Find-CloudCommand [-Query] <String> [[-Filter] <String>] [-AllResults] [<CommonParameters>]
+Find-CloudCommand [-Query] <String> [[-Filter] <String>] [-AllResults]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -126,7 +127,7 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutBuffer, -OutVariable, -PipelineVariable, -Verbose, -WarningAction, -WarningVariable, and -ProgressAction. 
 For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
@@ -143,4 +144,3 @@ Author: Jake Morrison - @jakemorrison - https://www.techthoughts.info/
 [https://github.com/Azure/azure-powershell/blob/main/documentation/azure-powershell-modules.md](https://github.com/Azure/azure-powershell/blob/main/documentation/azure-powershell-modules.md)
 
 [https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/powershell.htm](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/powershell.htm)
-

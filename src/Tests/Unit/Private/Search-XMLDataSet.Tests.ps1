@@ -161,17 +161,28 @@ in order to stop getting charged for the storage of uploaded parts,  you should 
                     $xmlObj
                 } -Verifiable
                 Search-XMLDataSet -Query $cleanQuery -Filter AWS
+
                 Assert-VerifiableMock
+                Should -Invoke -CommandName Get-ChildItem -Times 1 -Exactly
             } #it
 
             It 'should filter properly for Azure based on user input' {
-                Mock -CommandName Get-ChildItem {
-                    $Filter | Should -BeExactly 'Az.*'
-                    # $ErrorAction | Should -BeExactly 'Stop'
-                    $xmlObj
-                } -Verifiable
+                $script:mockCalled = 0
+                Mock -CommandName Get-ChildItem -MockWith {
+                    $script:mockCalled++
+                    if ($script:mockCalled -eq 1) {
+                        $Filter | Should -BeExactly 'Az.*'
+                    }
+                    elseif ($script:mockCalled -eq 2) {
+                        $Filter | Should -BeExactly 'Microsoft.Graph.*'
+                    }
+                    # Return a mock XML object or similar to simulate the command's output
+                    return $mockXmlObj
+                }
+
                 Search-XMLDataSet -Query $cleanQuery -Filter Azure
-                Assert-VerifiableMock
+
+                Should -Invoke -CommandName Get-ChildItem -Times 2 -Exactly
             } #it
 
             It 'should filter properly for Oracle based on user input' {
@@ -181,7 +192,9 @@ in order to stop getting charged for the storage of uploaded parts,  you should 
                     $xmlObj
                 } -Verifiable
                 Search-XMLDataSet -Query $cleanQuery -Filter Oracle
+
                 Assert-VerifiableMock
+                Should -Invoke -CommandName Get-ChildItem -Times 1 -Exactly
             } #it
 
             It 'should filter properly for free form query based on user input' {
@@ -191,7 +204,9 @@ in order to stop getting charged for the storage of uploaded parts,  you should 
                     $xmlObj
                 } -Verifiable
                 Search-XMLDataSet -Query $cleanQuery
+
                 Assert-VerifiableMock
+                Should -Invoke -CommandName Get-ChildItem -Times 1 -Exactly
             } #it
 
         } #context_Filter

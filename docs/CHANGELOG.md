@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0]
+
+- Module Changes
+    - Added support for Azure Graph modules
+- Build Updates
+    - Added `MarkdownRepair.ps1` and added Markdown repair logic to InvokeBuild script.
+
 ## [1.0.0]
 
 - Module Changes
