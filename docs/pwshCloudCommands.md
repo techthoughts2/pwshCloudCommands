@@ -2,7 +2,7 @@
 Module Name: pwshCloudCommands
 Module Guid: be3705bf-2c38-413a-8973-9e409e826d35
 Download Help Link: NA
-Help Version: 1.0.0
+Help Version: 1.1.0
 Locale: en-US
 ---
 

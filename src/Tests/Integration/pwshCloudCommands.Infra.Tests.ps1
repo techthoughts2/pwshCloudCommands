@@ -40,6 +40,16 @@ InModuleScope 'pwshCloudCommands' {
                 $eval.Count | Should -BeGreaterThan 20
             } #it
 
+            It 'should return expected results for graph module query' {
+                $eval = Find-CloudCommand -Query 'Get-MgUser' -Filter Azure
+                $eval.ModuleName | Should -BeExactly 'Microsoft.Graph.Users'
+            } #it
+
+            It 'should return expected results for oracle module query' {
+                $eval = Find-CloudCommand -Query 'New-OCIComputeInstance' -Filter Oracle
+                $eval.ModuleName | Should -BeExactly 'OCI.PSModules.Core'
+            } #it
+
         } #context_Find-CloudCommand
         Context 'Get-CloudCommandFromFile' {
 
